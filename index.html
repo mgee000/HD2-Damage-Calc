@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEAF Ordnance Table — Shots to Kill</title>
+<style>
+:root{
+  --void:#14161a; --plate:#1b1e24; --plate2:#22262e; --steel:#333a45;
+  --seaf:#ffd21e; --seaf-dim:#8a7418; --alert:#e0413a; --good:#5ec27a; --warn:#e08a3a;
+  --ink:#d8dce3; --dim:#78818e;
+  --display:"Haettenschweiler","Arial Narrow Bold","Oswald",Impact,"Franklin Gothic Bold",sans-serif;
+  --data:ui-monospace,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--void);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.hazard{height:6px;background:repeating-linear-gradient(135deg,var(--seaf) 0 10px,var(--void) 10px 20px);opacity:.85}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+header{padding:26px 0 18px}
+h1{margin:0;font-size:clamp(34px,6.5vw,62px);font-family:var(--display);text-transform:uppercase;letter-spacing:.055em;line-height:.94;font-weight:400}
+h1 .y{color:var(--seaf)}
+.subhead{font-family:var(--data);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-top:10px}
+
+.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0 8px}
+@media(max-width:820px){.controls{grid-template-columns:1fr}}
+.field{background:var(--plate);border:1px solid var(--steel);padding:14px 14px 16px}
+.field label{display:block;font-family:var(--data);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--seaf);margin-bottom:9px}
+select,input{width:100%;background:var(--void);color:var(--ink);border:1px solid var(--steel);padding:9px 10px;font-family:var(--data);font-size:13px;border-radius:0}
+input::placeholder{color:#5b636e}
+select:focus-visible,input:focus-visible{outline:2px solid var(--seaf);outline-offset:1px}
+#filter{margin-bottom:8px}
+.hint{font-family:var(--data);font-size:10.5px;color:var(--dim);margin-top:8px;letter-spacing:.04em}
+
+.magrow{display:flex;align-items:flex-end;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.magrow .field{flex:0 0 210px;padding:12px 14px 14px}
+.magrow #pelField{flex:0 0 260px}
+.magrow #fireField{flex:0 0 290px}
+.firestr{display:flex;align-items:center;gap:10px;margin-top:10px}
+.firestr label{margin:0;flex:0 0 auto;color:var(--dim)}
+.firestr input{width:80px;padding:5px 7px}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;padding:0;border:0;height:22px;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:6px;background:var(--void);border:1px solid var(--steel)}
+input[type=range]::-moz-range-track{height:6px;background:var(--void);border:1px solid var(--steel)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:20px;margin-top:-8px;background:var(--seaf);border:0}
+input[type=range]::-moz-range-thumb{width:12px;height:20px;background:var(--seaf);border:0;border-radius:0}
+.magnote{font-family:var(--data);font-size:10.5px;color:var(--dim);max-width:540px;padding-bottom:4px;letter-spacing:.03em}
+
+.readout{border:1px solid var(--steel);background:linear-gradient(180deg,var(--plate2),var(--plate));padding:26px 24px}
+.verdict{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
+.stk{font-family:var(--display);font-size:clamp(64px,15vw,132px);line-height:.8;color:var(--seaf);letter-spacing:.01em}
+.stk.blocked{color:var(--alert)}
+.stk-unit{font-family:var(--data);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.killline{font-family:var(--data);font-size:12.5px;letter-spacing:.05em;margin-top:14px}
+.killline b{color:var(--seaf);font-weight:600}
+.flag{display:inline-block;font-family:var(--data);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;padding:4px 9px;margin:14px 8px 0 0;border:1px solid currentColor}
+.flag.reload{color:var(--seaf)} .flag.clean{color:var(--good)}
+.flag.block{color:var(--alert)} .flag.armor{color:var(--warn)}
+.flag.fire{color:#e8703a}
+
+.belt{margin-top:24px}
+.belt-label{font-family:var(--data);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:9px}
+.belt-track{display:flex;flex-wrap:wrap;align-items:flex-end;gap:3px}
+.rnd{width:9px;height:26px;background:var(--seaf-dim);flex:0 0 auto}
+.rnd.kill{background:var(--alert);height:34px}
+.magbreak{flex:0 0 auto;width:20px;height:34px;position:relative}
+.magbreak::after{content:"";position:absolute;left:9px;top:0;bottom:0;width:2px;background:repeating-linear-gradient(180deg,var(--alert) 0 5px,transparent 5px 10px)}
+.belt-overflow{font-family:var(--data);font-size:11px;color:var(--dim);margin-top:10px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px 0 40px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+.card{border:1px solid var(--steel);background:var(--plate);padding:16px 16px 18px}
+.card h2{font-family:var(--data);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--seaf);margin:0 0 12px;font-weight:500}
+table{width:100%;border-collapse:collapse;font-family:var(--data);font-size:12.5px}
+td{padding:5px 0;vertical-align:top}
+td:first-child{color:var(--dim);padding-right:14px;white-space:nowrap}
+td:last-child{text-align:right}
+tr.hi td:last-child{color:var(--seaf)} tr.bad td:last-child{color:var(--alert)}
+.mathline{font-family:var(--data);font-size:12px;color:var(--dim);line-height:1.75;margin-top:12px;padding-top:12px;border-top:1px solid var(--steel);word-break:break-word}
+.mathline em{color:var(--ink);font-style:normal}
+.drop{border:1px solid var(--steel);background:var(--plate);margin:0 0 22px}
+.drop>summary{cursor:pointer;list-style:none;padding:13px 16px;font-family:var(--data);font-size:10px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--seaf);user-select:none}
+.drop>summary::-webkit-details-marker{display:none}
+.drop>summary::before{content:"▸ ";color:var(--dim)}
+.drop[open]>summary::before{content:"▾ "}
+.drop>summary:hover{background:var(--plate2)}
+.drop>summary:focus-visible{outline:2px solid var(--seaf);outline-offset:-2px}
+.dropbody{padding:4px 16px 18px;border-top:1px solid var(--steel)}
+#rangeChart svg{display:block;width:100%;height:auto;max-width:620px}
+.chartna{font-family:var(--data);font-size:12px;color:var(--dim);padding:14px 0}
+footer{border-top:1px solid var(--steel);padding:0 0 44px;font-family:var(--data);font-size:11px;color:var(--dim);line-height:1.8}
+footer a{color:var(--seaf-dim)} footer strong{color:var(--dim);font-weight:600}
+.drop.notes{border-left:0;border-right:0;border-top:0;margin:0}
+.drop.notes>summary{padding:16px 0}
+.drop.notes .dropbody{padding:0;border-top:0}
+.notes p{margin:0 0 16px;max-width:78ch}
+.notes p:last-child{margin-bottom:4px}
+.source{padding:16px 0 0;border-top:1px solid var(--steel)}
+</style>
+</head>
+<body>
+<div class="hazard"></div>
+<div class="wrap">
+  <header>
+    <h1>Shots to <span class="y">Kill</span></h1>
+    <div class="subhead">SEAF ordnance table · pick a weapon, a target, and where you're hitting it</div>
+  </header>
+
+  <div class="controls">
+    <div class="field">
+      <label for="filter">Weapon</label>
+      <input type="text" id="filter" placeholder="filter by name…" autocomplete="off">
+      <select id="weapon"></select>
+      <div class="hint" id="weaponStats">—</div>
+    </div>
+    <div class="field">
+      <label for="enemy">Target</label>
+      <select id="enemy"></select>
+      <div class="hint" id="enemyStats">—</div>
+    </div>
+    <div class="field">
+      <label for="part">Hit location</label>
+      <select id="part"></select>
+      <div class="hint" id="partStats">—</div>
+    </div>
+  </div>
+
+  <div class="magrow">
+    <div class="field">
+      <label for="mag" id="magLabel">Rounds per magazine</label>
+      <input type="number" id="mag" min="1" max="99999" step="1">
+    </div>
+    <div class="field" id="pelField">
+      <label for="pel">Pellets on target — <span id="pelVal">12</span> of <span id="pelMax">12</span></label>
+      <input type="range" id="pel" min="1" max="12" step="1">
+      <div class="hint" id="pelHint">—</div>
+    </div>
+    <div class="field" id="fragField">
+      <label for="frag">Shrapnel on target — <span id="fragVal">0</span> of <span id="fragMax">30</span></label>
+      <input type="range" id="frag" min="0" max="30" step="1">
+      <div class="hint" id="fragHint">—</div>
+    </div>
+    <div class="field" id="rangeField">
+      <label for="rangeIn">Engagement range — <span id="rangeVal">10</span> m</label>
+      <input type="range" id="rangeIn" min="0" max="100" step="1" value="10">
+      <div class="hint" id="rangeHint">—</div>
+    </div>
+    <div class="field" id="fireField">
+      <label for="fireSec">Seconds on fire — <span id="fireSecVal">3</span>s</label>
+      <input type="range" id="fireSec" min="0" max="12" step="0.5" value="3">
+      <div class="firestr">
+        <label for="fireStr">Buildup per hit</label>
+        <input type="number" id="fireStr" min="0.05" max="50" step="0.05">
+      </div>
+      <div class="hint" id="fireHint">—</div>
+    </div>
+    <div class="magnote">
+      Damage, durability and armour values come from the wiki. Magazine sizes, pellet counts, the
+      shrapnel ceiling and burn buildup are sensible defaults — change them if your loadout or the
+      current patch says otherwise. Seconds on fire starts at the standard three-second burn.
+    </div>
+  </div>
+
+  <div class="readout">
+    <div class="verdict">
+      <div class="stk" id="stk">—</div>
+      <div>
+        <div class="stk-unit" id="stkUnit">shots</div>
+        <div class="killline" id="killline">Select a weapon and target.</div>
+      </div>
+    </div>
+    <div id="flags"></div>
+    <div class="belt" id="beltWrap">
+      <div class="belt-label" id="beltLabel">Ammunition expended</div>
+      <div class="belt-track" id="belt"></div>
+      <div class="belt-overflow" id="beltOverflow"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2 id="dmgHead">Damage per shot</h2>
+      <table id="dmgTable"></table>
+      <div class="mathline" id="mathline"></div>
+    </div>
+    <div class="card">
+      <h2>What has to break</h2>
+      <table id="poolTable"></table>
+      <div class="mathline" id="notesline"></div>
+    </div>
+  </div>
+
+  <details class="drop" id="rangeCard">
+    <summary>Damage over distance</summary>
+    <div class="dropbody">
+      <div id="rangeChart"></div>
+      <div class="mathline" id="rangeNote"></div>
+    </div>
+  </details>
+
+  <footer>
+    <details class="drop notes" id="notesCard">
+      <summary>How this is calculated</summary>
+      <div class="dropbody">
+
+        <p><strong>Armour and durability.</strong>
+        Armour penetration is checked first: if the weapon's AP is below the part's armour value the
+        shot bounces for zero. Equal AP and AV deals 65%; higher AP deals full damage.
+        Damage is then split by the part's durability — <em>standard × (1 − durable%) + durable damage × durable%</em>
+        — and each hit also feeds a percentage through to the main health pool. The target dies when a
+        fatal part is destroyed or main health hits zero.</p>
+
+        <p><strong>Pellets.</strong> Each pellet resolves as its own hit against the part, so a shotgun's
+        trigger pull is simply that many separate impacts — which is why the per-pellet damage, not the
+        advertised total, is what gets checked against armour. The slider defaults to every pellet landing;
+        drag it down to model realistic spread at range. Pellet counts are the figures the community most
+        consistently reports rather than datamined values, and they shift between patches, so treat them as
+        a starting point.</p>
+
+        <p><strong>Impact, blast and shrapnel.</strong> A round that explodes lands more than one thing on the
+        target, and each one carries its own armour penetration. They are resolved separately and in order
+        — impact, then blast, then fragments — so a shot can punch through with one component and bounce
+        with another. An Ultimatum into a Hulk's head lands the AP6 impact <em>and</em> the AP6 blast;
+        an Eruptor into that same head lands its AP4 impact while the AP3 blast and shrapnel ricochet, which
+        is why the two feel so different despite similar paper numbers. The totals shown are for one
+        trigger pull.</p>
+
+        <p><strong>The shrapnel slider is an assumption, not a source.</strong> Per-fragment damage comes from
+        the wiki, but how many fragments actually strike your target does not — it depends on range, angle
+        and hitbox, and the fragment count has been changed and removed and re-added across patches. The
+        slider starts at zero so the headline number is the part you can rely on; drag it up to see the
+        best case.</p>
+
+        <p><strong>Range and falloff.</strong> The wiki's rule is that damage tracks velocity: a
+        round travelling slower than its muzzle speed has lost damage, and one travelling faster —
+        fired while diving, or from a moving FRV — has gained some. Drag is what sheds that velocity
+        and mass is what resists it, so a weapon with a 0% drag factor genuinely loses nothing at any
+        distance while everything else falls away steadily. Each weapon's page carries the three
+        numbers this needs: mass, muzzle velocity and drag factor. Falloff applies to the projectile
+        only — a blast and its fragments fade from where the round detonates, which is a separate
+        system and is not modelled here.</p>
+
+        <p><strong>Fall-off is measured, not modelled.</strong> Fifty-one weapons here carry real
+        range-test data: each one shot at eight fixed distances out to 200m and recorded to within
+        about 0.3%, from the community-compiled Helldivers II Index. Nothing is fitted or
+        extrapolated — the curve you see is the measurements joined up. This replaced an earlier
+        version of this tool that derived curves from drag and mass with a calibrated constant, and
+        it is worth saying how wrong that was: it had the Liberator down to 70% of its damage at
+        100m when the real figure is 86.7%, and it had the Accelerator Rifle losing 68% at 100m when
+        the real figure is 10.8%. The 68% belongs to the Scorcher, a completely different weapon.</p>
+
+        <p><strong>What the numbers actually show.</strong> The spread is far wider than any single
+        rule would suggest. An Anti-Materiel Rifle still has 88% of its damage at 200m; a Redeemer
+        is down to 64% at 50m and a Breaker to 76%. Plasma splits in two: the Scorcher is one of the
+        worst in the game at 67.7% lost by 100m, while the Accelerator Rifle beside it in the menu
+        is one of the best. Losses top out near 74.2%, past which the dataset notes the round simply
+        cannot reach. And one weapon runs backwards — the Ultimatum's round is slow enough that it
+        <em>gains</em> damage as it falls under gravity, measured at 26.6% above its listed damage
+        by 50m.</p>
+
+        <p><strong>Flat lines, and which kind they are.</strong> Thirty-eight weapons are flat
+        because the mechanic genuinely doesn't reach them, and the chart says which reason applies.
+        Beams and sprays fire no discrete projectile, so there is no velocity to shed. Arcs carry no
+        projectile data at all. Guided rounds accelerate back to their initial velocity. Two weapons
+        are measured at 0% drag on their own wiki pages. And explosion rows are flat because the
+        wiki states outright that fall-off applies to the projectile only — a blast does fade, but
+        from where it detonates rather than from where you stood, which is a different system and
+        not modelled here. Only two weapons are flat for want of evidence: the R-4 Hyena and the
+        SG-88 Break-Action are absent from the measured dataset, and their charts say so.</p>
+
+        <p><strong>Where these figures come from and what that's worth.</strong> The range tests are
+        community measurements, not published by the game or the wiki, which describes fall-off only
+        qualitatively and never prints a rate. They are hand-tested and internally consistent — the
+        projectile stats beside them line up with the mechanic the wiki does describe, with calibre
+        driving loss hardest and mass resisting it — but they are one dataset, and a patch can move
+        them. Treat them as the best available evidence rather than as official values.</p>
+
+        <p><strong>Penetration slowdown is not a range stat.</strong> It appears next to drag on the
+        same table and is easy to read as one, but it is the velocity a round loses punching
+        <em>through</em> a body: the Liberator's 25% means a round that cleaves a target exits at
+        three quarters of its speed, carrying less damage into whatever is behind it. It costs
+        nothing over open distance. Cleaving itself — which needs the round's AP to exceed the
+        part's armour by 2 or more, and drops its AP by 1 per hitbox — is not modelled here at all,
+        so penetration slowdown does not enter the arithmetic.</p>
+
+        <p><strong>Burning.</strong> Fire is a status rather than part of the round. Each impact adds its
+        buildup to a meter, and once that meter passes the target's ignition threshold the target
+        catches and burns for a fixed time no matter what you do next. Burning deals 100 a second at
+        AP4, does the same damage to durable parts as to soft ones, and lasts three seconds unmodified —
+        all four figures are the wiki's. Each enemy then scales it by its own fire multiplier, and the
+        burn ticks against <em>main health only</em>, so it does nothing to speed up a kill that depends
+        on destroying a fatal part. If the target dies at or before the shot that guarantees ignition,
+        the burn is not counted at all.</p>
+
+        <p><strong>Which fire numbers are sourced and which are not.</strong> The 100/s, the AP4, the three
+        second duration and the multipliers for the Warrior, Brood Commander, Charger, Impaler, Bile
+        Titan and Hulk all come from the wiki, as does the Hulk's minimum ignition threshold of 9 and
+        the Breaker Incendiary's 0.6 buildup per pellet. Every <em>other</em> ignition threshold and
+        every other weapon's buildup per hit is an estimate — those values are not published anywhere.
+        That is why buildup per hit is an editable box rather than a fixed figure: change it if you have
+        better numbers. Treat the shots-to-ignite figure as a ballpark, not a measurement.</p>
+
+        <p><strong>Units.</strong> Beam and flame weapons are listed by damage per second or per tick, so their
+        result reads as a duration on target rather than a count of trigger pulls — the label under the
+        number tells you which. The Meltagun is the exception: it fires in discrete charged bursts, so it
+        is counted in shots like any other weapon.</p>
+
+        <p><strong>Not modelled.</strong> Splash onto <em>other</em> parts of the same enemy, blast radius
+        falloff, gas damage over time, burn stacking and refreshes, shield regeneration and
+        overpenetration.</p>
+
+      </div>
+    </details>
+    <div class="source">Stats from
+    <a href="https://helldivers.wiki.gg/wiki/Damage">helldivers.wiki.gg</a>, August 2026.</div>
+  </footer>
+</div>
+
+<script>
+/* ===================== WEAPONS =====================
+   d = damage, dur = durable damage, ap = armour penetration,
+   mag = rounds/uses before reload (9999 = no magazine),
+   pel = pellets per trigger pull,
+   t = explosion | beam | arc (blank = ballistic projectile)
+
+   One trigger pull can land several separate damage instances, each of which
+   runs its own armour check against the part it hits:
+     blast:{d,dur,ap}     the explosion that follows the impact
+     frag:{d,dur,ap,n}    shrapnel, n = maximum fragments the slider allows
+   A weapon with no blast/frag is a single-instance hit as before.
+   Every d/dur/ap value is taken from the wiki damage comparison table.
+   Fragment COUNTS are not in that table — see the note in the footer. */
+const WEAPONS = [
+ {g:"Assault rifles",n:"AR-23 Liberator",d:90,dur:22,ap:2,mag:45},
+ {g:"Assault rifles",n:"AR-23A Liberator Carbine",d:90,dur:22,ap:2,mag:45},
+ {g:"Assault rifles",n:"AR-23C Liberator Concussive",d:75,dur:35,ap:2,mag:45},
+ {g:"Assault rifles",n:"AR-23P Liberator Penetrator",d:65,dur:15,ap:3,mag:45},
+ {g:"Assault rifles",n:"AR-2 Coyote",d:75,dur:10,ap:3,mag:50,fire:{str:0.3}},
+ {g:"Assault rifles",n:"AR-32 Pacifier",d:55,dur:10,ap:3,mag:60},
+ {g:"Assault rifles",n:"AR-59 Suppressor",d:80,dur:20,ap:2,mag:45},
+ {g:"Assault rifles",n:"AR/GL-21 One-Two",d:95,dur:24,ap:2,mag:30},
+ {g:"Assault rifles",n:"AR/GL-21 One-Two — underbarrel grenade",d:250,dur:250,ap:3,mag:1,blast:{d:400,dur:400,ap:3}},
+ {g:"Assault rifles",n:"StA-52 Assault Rifle",d:90,dur:22,ap:2,mag:45},
+
+ {g:"Marksman rifles",n:"BR-14 Adjudicator",d:95,dur:23,ap:3,mag:30},
+ {g:"Marksman rifles",n:"R-63 Diligence",d:165,dur:45,ap:2,mag:20},
+ {g:"Marksman rifles",n:"R-63CS Diligence Counter Sniper",d:200,dur:50,ap:3,mag:20},
+ {g:"Marksman rifles",n:"R-2 Amendment",d:200,dur:50,ap:2,mag:20},
+ {g:"Marksman rifles",n:"R-72 Censor",d:165,dur:45,ap:2,mag:30},
+ {g:"Marksman rifles",n:"R-4 Hyena",d:220,dur:45,ap:3,mag:10},
+ {g:"Marksman rifles",n:"R-2124 Constitution",d:180,dur:50,ap:3,mag:5},
+ {g:"Marksman rifles",n:"R/40-K Hot-Shot Marksman Rifle",d:275,dur:40,ap:3,mag:12},
+ {g:"Marksman rifles",n:"R-36 Eruptor",d:230,dur:115,ap:4,mag:5,blast:{d:225,dur:225,ap:3},frag:{d:110,dur:35,ap:3,n:30}},
+
+ {g:"SMGs",n:"SMG-32 Reprimand",d:140,dur:32,ap:3,mag:25},
+ {g:"SMGs",n:"SMG-72 Pummeler",d:85,dur:17,ap:2,mag:45},
+ {g:"SMGs",n:"M7S SMG",d:90,dur:18,ap:2,mag:60},
+ {g:"SMGs",n:"MGX-42 Bullet Storm",d:100,dur:25,ap:2,mag:100},
+ {g:"SMGs",n:"VG-70 Variable",d:85,dur:23,ap:2,mag:40},
+
+ {g:"Shotguns",n:"SG-8 Punisher",d:45,dur:12,ap:2,mag:16,pel:12},
+ {g:"Shotguns",n:"SG-8S Slugger",d:330,dur:90,ap:3,mag:16},
+ {g:"Shotguns",n:"SG-8P Punisher Plasma — blast",d:225,dur:225,ap:3,mag:8,t:"explosion"},
+ {g:"Shotguns",n:"SG-20 Halt — flechette",d:35,dur:10,ap:3,mag:16,pel:11},
+ {g:"Shotguns",n:"SG-20 Halt — stun round",d:6,dur:2,ap:2,mag:16,pel:20},
+ {g:"Shotguns",n:"SG-22 Bushwhacker",d:45,dur:12,ap:2,mag:3,pel:12},
+ {g:"Shotguns",n:"SG-88 Break-Action",d:65,dur:13,ap:2,mag:2,pel:12},
+ {g:"Shotguns",n:"SG-97 Sweeper",d:42,dur:11,ap:3,mag:12,pel:10},
+ {g:"Shotguns",n:"SG-225 Breaker",d:30,dur:6,ap:2,mag:13,pel:11},
+ {g:"Shotguns",n:"SG-225SP Spray & Pray",d:15,dur:4,ap:2,mag:26,pel:16},
+ {g:"Shotguns",n:"SG-225IE Breaker Incendiary",d:20,dur:10,ap:2,mag:25,pel:16,fire:{str:0.6}},
+ {g:"Shotguns",n:"SG-451 Cookout",d:16,dur:3,ap:2,mag:16,pel:20,fire:{str:0.6}},
+ {g:"Shotguns",n:"DBS-2 Double Freedom",d:70,dur:35,ap:3,mag:2,pel:12},
+ {g:"Shotguns",n:"M90A Shotgun",d:55,dur:20,ap:2,mag:8,pel:8},
+
+ {g:"Energy weapons",n:"LAS-16 Sickle",d:60,dur:6,ap:2,mag:300},
+ {g:"Energy weapons",n:"LAS-17 Double-Edge Sickle — cold",d:60,dur:6,ap:2,mag:300},
+ {g:"Energy weapons",n:"LAS-17 Double-Edge Sickle — 26% heat",d:55,dur:5,ap:3,mag:300,fire:{str:0.4}},
+ {g:"Energy weapons",n:"LAS-17 Double-Edge Sickle — hot",d:70,dur:7,ap:3,mag:300,fire:{str:0.6}},
+ {g:"Energy weapons",n:"LAS-17 Double-Edge Sickle — 90% heat",d:70,dur:7,ap:4,mag:300,fire:{str:0.8}},
+ {g:"Energy weapons",n:"LAS-58 Talon",d:200,dur:20,ap:3,mag:50},
+ {g:"Energy weapons",n:"LAS-5 Scythe (per second)",d:350,dur:70,ap:2,mag:9999,t:"beam",rate:"s",fire:{str:1.0}},
+ {g:"Energy weapons",n:"LAS-7 Dagger (per second)",d:250,dur:50,ap:2,mag:9999,t:"beam",rate:"s",fire:{str:1.0}},
+ {g:"Energy weapons",n:"LAS-13 Trident (per second)",d:60,dur:6,ap:2,mag:9999,t:"beam",rate:"s"},
+ {g:"Energy weapons",n:"PLAS-39 Accelerator Rifle",d:250,dur:125,ap:3,mag:10,blast:{d:100,dur:100,ap:3}},
+
+ {g:"Sidearms",n:"P-2 Peacemaker",d:100,dur:32,ap:2,mag:15},
+ {g:"Sidearms",n:"P-19 Redeemer",d:70,dur:12,ap:2,mag:31},
+ {g:"Sidearms",n:"P-113 Verdict",d:140,dur:32,ap:3,mag:15},
+ {g:"Sidearms",n:"P-4 Senator",d:225,dur:75,ap:4,mag:6},
+ {g:"Sidearms",n:"M6C/SOCOM Pistol",d:125,dur:28,ap:2,mag:12},
+ {g:"Sidearms",n:"MP-98 Knight",d:90,dur:18,ap:2,mag:50},
+ {g:"Sidearms",n:"P-33 Missile Pistol",d:1000,dur:1000,ap:5,mag:1,blast:{d:300,dur:300,ap:3}},
+ {g:"Sidearms",n:"GP-31 Grenade Pistol",d:250,dur:250,ap:3,mag:1,blast:{d:400,dur:400,ap:3}},
+ {g:"Sidearms",n:"GP-20 Ultimatum",d:1000,dur:1000,ap:6,mag:1,blast:{d:2000,dur:2000,ap:6}},
+ {g:"Sidearms",n:"P/40-K Bolt Pistol",d:325,dur:115,ap:4,mag:6,blast:{d:175,dur:175,ap:3}},
+ {g:"Sidearms",n:"P-72 Crisper (per tick)",d:2,dur:2,ap:4,mag:9999,t:"beam",rate:"tick",fire:{str:0.5}},
+
+ {g:"Support weapons",n:"M-105 Stalwart",d:90,dur:22,ap:2,mag:250},
+ {g:"Support weapons",n:"MG-43 Machine Gun",d:90,dur:23,ap:3,mag:150},
+ {g:"Support weapons",n:"M-1000 Maxigun",d:80,dur:18,ap:3,mag:200},
+ {g:"Support weapons",n:"MG-206 Heavy Machine Gun",d:150,dur:35,ap:4,mag:75},
+ {g:"Support weapons",n:"APW-1 Anti-Materiel Rifle",d:450,dur:225,ap:4,mag:6},
+ {g:"Support weapons",n:"AC-8 Autocannon — APHET",d:325,dur:260,ap:4,mag:10,blast:{d:150,dur:150,ap:3}},
+ {g:"Support weapons",n:"AC-8 Autocannon — flak",d:150,dur:150,ap:2,mag:10,blast:{d:190,dur:190,ap:3}},
+ {g:"Support weapons",n:"AC-8 Autocannon — shrapnel (one fragment)",d:110,dur:35,ap:3,mag:10},
+ {g:"Support weapons",n:"RS-422 Railgun",d:600,dur:225,ap:5,mag:20},
+ {g:"Support weapons",n:"RS-422 Railgun — overcharge blast",d:300,dur:300,ap:3,mag:20,t:"explosion"},
+ {g:"Support weapons",n:"LAS-98 Laser Cannon (per second)",d:350,dur:200,ap:4,mag:9999,t:"beam",rate:"s",fire:{str:1.0}},
+ {g:"Support weapons",n:"40-K Meltagun",d:3640,dur:3640,ap:7,mag:3,
+  note:"One trigger pull is a charged burst firing for about 1.4 seconds, so 2,600 a second comes to 3,640 a burst at point blank — the figure used here. Three bursts a cell and four spare cells, so fifteen bursts in all. Damage falls off with range in a way no other beam does: at the 15m maximum it loses 40%, nearer 2,180 a burst. It inflicts fire panic and slow but not the burning damage-over-time."},
+ {g:"Support weapons",n:"ARC-3 Arc Thrower",d:250,dur:100,ap:7,mag:9999,t:"arc"},
+ {g:"Support weapons",n:"GL-21 Grenade Launcher — blast",d:400,dur:400,ap:3,mag:6,t:"explosion"},
+ {g:"Support weapons",n:"GL-28 Belt-Fed GL — blast",d:150,dur:150,ap:4,mag:30,t:"explosion"},
+ {g:"Support weapons",n:"GL-52 De-Escalator — arc",d:100,dur:70,ap:4,mag:30,t:"arc"},
+ {g:"Support weapons",n:"FLAM-40 Flamethrower (per tick)",d:2,dur:2,ap:4,mag:9999,t:"beam",rate:"tick",fire:{str:0.5}},
+ {g:"Support weapons",n:"FLAM-66 Torcher (per tick)",d:2,dur:2,ap:4,mag:9999,t:"beam",rate:"tick",fire:{str:0.5}},
+ {g:"Support weapons",n:"B/FLAM-80 Cremator (per tick)",d:3,dur:3,ap:4,mag:9999,t:"beam",rate:"tick",fire:{str:0.5}},
+
+ {g:"Anti-tank",n:"EAT-700 Expendable Napalm",d:500,dur:500,ap:3,mag:1,blast:{d:250,dur:250,ap:6},fire:{str:6}},
+ {g:"Anti-tank",n:"MLS-4X Commando",d:1100,dur:1100,ap:6,mag:4,blast:{d:150,dur:150,ap:3}},
+ {g:"Anti-tank",n:"GR-8 Recoilless Rifle — HEAT",d:3200,dur:3200,ap:6,mag:1},
+ {g:"Anti-tank",n:"GR-8 Recoilless Rifle — HE",d:750,dur:750,ap:5,mag:1,blast:{d:800,dur:800,ap:4}},
+ {g:"Anti-tank",n:"FAF-14 Spear",d:4000,dur:4000,ap:7,mag:1,blast:{d:200,dur:200,ap:3}},
+ {g:"Anti-tank",n:"StA-X3 W.A.S.P. — burst missile",d:200,dur:200,ap:6,mag:12,blast:{d:600,dur:600,ap:3}},
+
+ {g:"Backpacks & exosuits",n:"AX/AR-23 Guard Dog",d:65,dur:15,ap:3,mag:9999},
+ {g:"Backpacks & exosuits",n:"AX/LAS-5 Rover (per second)",d:200,dur:40,ap:2,mag:9999,t:"beam",rate:"s",fire:{str:1.0}},
+ {g:"Backpacks & exosuits",n:"AX/TX-13 Dog Breath (per tick)",d:1,dur:1,ap:5,mag:9999,t:"beam",rate:"tick"},
+ {g:"Backpacks & exosuits",n:"AX/FLAM-75 Hot Dog (per tick)",d:2,dur:2,ap:4,mag:9999,t:"beam",rate:"tick",fire:{str:0.5}},
+ {g:"Backpacks & exosuits",n:"EXO-49 Emancipator autocannon",d:300,dur:150,ap:5,mag:75,blast:{d:150,dur:150,ap:3}},
+ {g:"Backpacks & exosuits",n:"EXO-45 Patriot missile",d:1250,dur:1250,ap:6,mag:14,blast:{d:400,dur:400,ap:3}},
+ {g:"Backpacks & exosuits",n:"Lumberer anti-tank cannon",d:1300,dur:1300,ap:6,mag:1},
+ {g:"Backpacks & exosuits",n:"Lumberer flamethrower (per tick)",d:3,dur:3,ap:4,mag:9999,t:"beam",rate:"tick",fire:{str:0.5}},
+
+ {g:"Grenades",n:"G-12 High Explosive",d:800,dur:800,ap:4,mag:1,t:"explosion"},
+ {g:"Grenades",n:"G-16 Impact",d:400,dur:400,ap:4,mag:1,t:"explosion"},
+ {g:"Grenades",n:"G-10 Incendiary",d:300,dur:300,ap:3,mag:1,t:"explosion",fire:{str:5}},
+ {g:"Grenades",n:"G-13 Incendiary Impact",d:150,dur:150,ap:3,mag:1,t:"explosion",fire:{str:5}},
+ {g:"Grenades",n:"G-7 Pineapple",d:300,dur:300,ap:3,mag:1,t:"explosion"},
+ {g:"Grenades",n:"G-142 Pyrotech",d:50,dur:50,ap:3,mag:1,t:"explosion",fire:{str:6}},
+ {g:"Grenades",n:"G-50 Seeker",d:500,dur:500,ap:4,mag:1,t:"explosion"},
+ {g:"Grenades",n:"G-48 Giga Grenade",d:2000,dur:2000,ap:5,mag:1,t:"explosion"},
+ {g:"Grenades",n:"G-31 Arc",d:100,dur:70,ap:4,mag:1,t:"arc"},
+ {g:"Grenades",n:"G-23 Stun",d:0,dur:0,ap:6,mag:1,t:"explosion"},
+ {g:"Grenades",n:"G-109 Urchin",d:0,dur:0,ap:6,mag:1,t:"explosion"},
+ {g:"Grenades",n:"TED-63 Dynamite",d:1000,dur:1000,ap:4,mag:1,t:"explosion"},
+ {g:"Grenades",n:"B/MD C4 Pack",d:2000,dur:2000,ap:7,mag:1,t:"explosion"},
+
+ {g:"Eagle & orbital",n:"Eagle 500kg Bomb",d:2000,dur:2000,ap:7,mag:1,blast:{d:1500,dur:1500,ap:6}},
+ {g:"Eagle & orbital",n:"Eagle 110mm Rocket Pods",d:600,dur:600,ap:7,mag:1,blast:{d:300,dur:300,ap:4}},
+ {g:"Eagle & orbital",n:"Eagle Cluster Bomb — blast",d:350,dur:350,ap:3,mag:1,t:"explosion"},
+ {g:"Eagle & orbital",n:"Eagle Napalm Airstrike — blast",d:250,dur:250,ap:3,mag:1,t:"explosion",fire:{str:6}},
+ {g:"Eagle & orbital",n:"Eagle Smoke Strike — direct hit",d:1500,dur:1500,ap:7,mag:1},
+ {g:"Eagle & orbital",n:"Orbital Precision Strike",d:4000,dur:4000,ap:8,mag:1,blast:{d:1500,dur:1500,ap:6}},
+ {g:"Eagle & orbital",n:"Orbital Railcannon Strike",d:10000,dur:10000,ap:7,mag:1},
+ {g:"Eagle & orbital",n:"Orbital 380mm HE Barrage — shell",d:4000,dur:4000,ap:8,mag:1,blast:{d:1500,dur:1500,ap:6}},
+ {g:"Eagle & orbital",n:"Orbital 120mm HE Barrage — shell",d:3500,dur:3500,ap:7,mag:1,blast:{d:1200,dur:1200,ap:5}},
+ {g:"Eagle & orbital",n:"Orbital Walking Barrage — shell",d:4000,dur:4000,ap:8,mag:1},
+ {g:"Eagle & orbital",n:"Orbital Gatling Barrage — round",d:350,dur:200,ap:5,mag:1},
+ {g:"Eagle & orbital",n:"Orbital Napalm Barrage — shell",d:500,dur:500,ap:5,mag:1,fire:{str:6}},
+ {g:"Eagle & orbital",n:"Orbital Airburst Strike — blast",d:350,dur:350,ap:3,mag:1,t:"explosion"},
+ {g:"Eagle & orbital",n:"Orbital Gas Strike — direct hit",d:300,dur:300,ap:7,mag:1},
+ {g:"Eagle & orbital",n:"Orbital Laser (per second)",d:60,dur:60,ap:6,mag:9999,t:"beam",rate:"s"},
+
+ {g:"Mines",n:"Anti-Personnel Minefield",d:700,dur:700,ap:3,mag:1,t:"explosion"},
+ {g:"Mines",n:"Anti-Tank Mines",d:2000,dur:2000,ap:5,mag:1,t:"explosion"},
+ {g:"Mines",n:"Incendiary Mines",d:300,dur:300,ap:3,mag:1,t:"explosion",fire:{str:5}},
+ {g:"Mines",n:"Gas Mines",d:3,dur:3,ap:6,mag:1,t:"explosion"}
+];
+
+/* ===================== RANGE & DAMAGE FALLOFF =====================
+   The wiki's rule is that falloff is velocity-based: it is driven by a
+   projectile's calibre, speed, mass and drag, and a weapon whose drag factor
+   is 0% loses no damage at any distance at all. Those four figures live on
+   each weapon's own page, one page per weapon, so only the weapons whose
+   pages have actually been read can carry a real curve here.
+
+   rng = {max: metres on the x axis,
+          fo:  [[metres, damage multiplier], ...] interpolated between points,
+          src: "wiki" for a curve taken from the weapon's page,
+               "none" for a weapon whose page has not been read yet,
+          na:  true for thrown and called-in ordnance, where distance from the
+               shooter is not what governs the damage}
+
+   A single [[0,1]] curve means flat: full damage at every range. That is the
+   default for any weapon not in the sourced table below, and it is a
+   placeholder standing in for "not looked up", NOT a claim that the weapon
+   has no falloff. The chart labels it as such. */
+/* ===== MEASURED DAMAGE FALL-OFF =====
+   Every curve below is measured, not modelled. The figures come from the
+   community range-testing dataset behind the Helldivers II Index — 77 weapons
+   shot at eight fixed distances, hand-tested to within about 0.3%. That makes
+   these the best-evidenced numbers in this whole file, better than anything
+   derivable from the wiki's qualitative description of the mechanic.
+
+   Retained fraction of damage at each distance, interpolated between points.
+   cal/mass/v0/drag are the projectile stats the same dataset lists, kept for
+   display: the wiki's rule is that calibre drives fall-off hardest, mass
+   resists it, drag increases it and speed raises it slightly, and the table
+   bears that out — a 4g shotgun pellet at calibre 8 loses 40% by 100m while a
+   3300g calibre-85 recoilless round loses 4.5%.
+
+   max is the furthest distance actually measured. Losses peak around 74.2%,
+   past which the dataset notes the projectile can no longer reach the target. */
+const MEASURED = {
+ "AR-2 Coyote":{fo:[[0,1],[5,0.99],[15,0.981],[25,0.964],[50,0.938],[75,0.909],[100,0.878],[150,0.824],[200,0.778]],max:200,cal:7,mass:8,v0:650,drag:0.3},
+ "AR-23 Liberator":{fo:[[0,1],[5,0.993],[15,0.978],[25,0.962],[50,0.932],[75,0.898],[100,0.867],[150,0.81],[200,0.76]],max:200,cal:5.5,mass:4.5,v0:900,drag:0.3},
+ "AR-23A Liberator Carbine":{fo:[[0,1],[5,0.993],[15,0.978],[25,0.962],[50,0.932],[75,0.898],[100,0.867],[150,0.81],[200,0.76]],max:200,cal:5.5,mass:4.5,v0:900,drag:0.3},
+ "AR-23C Liberator Concussive":{fo:[[0,1],[5,0.993],[15,0.973],[25,0.96],[50,0.93],[75,0.901],[100,0.869],[150,0.811],[200,0.76]],max:200,cal:5.5,mass:4.5,v0:800,drag:0.3},
+ "AR-23P Liberator Penetrator":{fo:[[0,1],[5,0.991],[15,0.976],[25,0.958],[50,0.932],[75,0.894],[100,0.866],[150,0.81],[200,0.759]],max:200,cal:5.5,mass:4.5,v0:1000,drag:0.3},
+ "AR-32 Pacifier":{fo:[[0,1],[5,0.993],[15,0.978],[25,0.962],[50,0.932],[75,0.898],[100,0.867],[150,0.81],[200,0.76]],max:200,cal:5.5,mass:4.5,v0:900,drag:0.3},
+ "AR-59 Suppressor":{fo:[[0,1],[5,0.994],[15,0.98],[25,0.965],[50,0.932],[75,0.901],[100,0.87],[150,0.814],[200,0.762]],max:200,cal:5.5,mass:4.5,v0:330,drag:0.3},
+ "AR/GL-21 One-Two":{fo:[[0,1],[5,0.993],[15,0.981],[25,0.966],[50,0.938],[75,0.914],[100,0.885],[150,0.835],[200,0.787]],max:200,cal:8,mass:11,v0:920,drag:0.3},
+ "StA-52 Assault Rifle":{fo:[[0,1],[5,0.993],[15,0.978],[25,0.962],[50,0.932],[75,0.898],[100,0.867],[150,0.81],[200,0.76]],max:200,cal:5.5,mass:4.5,v0:900,drag:0.3},
+ "BR-14 Adjudicator":{fo:[[0,1],[5,0.994],[15,0.977],[25,0.969],[50,0.938],[75,0.91],[100,0.881],[150,0.833],[200,0.788]],max:200,cal:8,mass:11,v0:820,drag:0.3},
+ "PLAS-39 Accelerator Rifle":{fo:[[0,1],[5,0.993],[15,0.981],[25,0.967],[50,0.946],[75,0.92],[100,0.892],[150,0.844],[200,0.801]],max:200,cal:20,mass:25,v0:1000,drag:0.1},
+ "R-2 Amendment":{fo:[[0,1],[5,0.997],[15,0.99],[25,0.982],[50,0.968],[75,0.951],[100,0.932],[150,0.904],[200,0.874]],max:200,cal:8,mass:20,v0:850,drag:0.3},
+ "R-2124 Constitution":{fo:[[0,1],[5,0.997],[15,0.99],[25,0.982],[50,0.968],[75,0.951],[100,0.932],[150,0.904],[200,0.874]],max:200,cal:8,mass:20,v0:850,drag:0.3},
+ "R-63 Diligence":{fo:[[0,1],[5,0.996],[15,0.987],[25,0.978],[50,0.959],[75,0.938],[100,0.915],[150,0.878],[200,0.846]],max:200,cal:9,mass:20,v0:850,drag:0.3},
+ "R-63CS Diligence Counter Sniper":{fo:[[0,1],[5,0.995],[15,0.986],[25,0.975],[50,0.955],[75,0.936],[100,0.915],[150,0.879],[200,0.844]],max:200,cal:9,mass:20,v0:940,drag:0.3},
+ "R-72 Censor":{fo:[[0,1],[5,0.997],[15,0.991],[25,0.983],[50,0.967],[75,0.951],[100,0.935],[150,0.905],[200,0.875]],max:200,cal:8,mass:20,v0:330,drag:0.3},
+ "DBS-2 Double Freedom":{fo:[[0,1],[5,0.983],[15,0.944],[25,0.911],[50,0.837],[75,0.764],[100,0.7],[150,0.599],[200,0.524]],max:200,cal:8,mass:6,v0:385,drag:0.5},
+ "M90A Shotgun":{fo:[[0,1],[5,0.983],[15,0.944],[25,0.911],[50,0.837],[75,0.764],[100,0.7],[150,0.599],[200,0.524]],max:200,cal:8,mass:6,v0:385,drag:0.5},
+ "SG-20 Halt — flechette":{fo:[[0,1],[5,0.99],[15,0.966],[25,0.944],[50,0.895],[75,0.848],[100,0.802],[150,0.725],[200,0.659]],max:200,cal:8,mass:6,v0:385,drag:0.3},
+ "SG-20 Halt — stun round":{fo:[[0,1],[5,0.993],[15,0.973],[25,0.96],[50,0.93],[75,0.901],[100,0.869],[150,0.811],[200,0.76]],max:200,cal:5.5,mass:4.5,v0:800,drag:0.3},
+ "SG-225 Breaker":{fo:[[0,1],[5,0.965],[15,0.913],[25,0.87],[50,0.763],[75,0.674],[100,0.6],[150,0.49],[200,0.414]],max:200,cal:8,mass:4,v0:360,drag:0.5},
+ "SG-225IE Breaker Incendiary":{fo:[[0,1],[5,0.917],[15,0.776],[25,0.658],[50,0.479],[75,0.373],[100,0.316],[150,0.27]],max:150,cal:8,mass:2,v0:120,drag:0.8},
+ "SG-225SP Spray & Pray":{fo:[[0,1],[5,0.982],[15,0.952],[25,0.923],[50,0.859],[75,0.795],[100,0.74],[150,0.645],[200,0.57]],max:200,cal:3,mass:1,v0:250,drag:0.5},
+ "SG-451 Cookout":{fo:[[0,1],[5,0.917],[15,0.776],[25,0.658],[50,0.479],[75,0.373],[100,0.316],[150,0.27]],max:150,cal:8,mass:2,v0:120,drag:0.8},
+ "SG-8 Punisher":{fo:[[0,1],[5,0.983],[15,0.944],[25,0.911],[50,0.837],[75,0.764],[100,0.7],[150,0.599],[200,0.524]],max:200,cal:8,mass:6,v0:385,drag:0.5},
+ "SG-97 Sweeper":{fo:[[0,1],[5,0.987],[15,0.954],[25,0.928],[50,0.858],[75,0.801],[100,0.734],[150,0.656],[200,0.58]],max:200,cal:12,mass:10,v0:385,drag:0.3},
+ "SG-8S Slugger":{fo:[[0,1],[5,0.958],[15,0.873],[25,0.791],[50,0.66],[75,0.55],[100,0.466],[150,0.367],[200,0.314]],max:200,cal:18,mass:50,v0:390,drag:2},
+ "SG-22 Bushwhacker":{fo:[[0,1],[5,0.983],[15,0.944],[25,0.911],[50,0.837],[75,0.764],[100,0.7],[150,0.599],[200,0.524]],max:200,cal:8,mass:6,v0:385,drag:0.5},
+ "VG-70 Variable":{fo:[[0,1],[5,0.972],[15,0.925],[25,0.882],[50,0.793],[75,0.707],[100,0.638],[150,0.528],[200,0.451]],max:200,cal:9,mass:7,v0:320,drag:0.6},
+ "M7S SMG":{fo:[[0,1],[5,0.948],[15,0.859],[25,0.786],[50,0.643],[75,0.53],[100,0.45],[150,0.353],[200,0.304]],max:200,cal:9,mass:7,v0:320,drag:1.2},
+ "MP-98 Knight":{fo:[[0,1],[5,0.938],[15,0.856],[25,0.786],[50,0.642],[75,0.53],[100,0.448],[150,0.353],[200,0.304]],max:200,cal:9,mass:7,v0:375,drag:1.2},
+ "SMG-32 Reprimand":{fo:[[0,1],[5,0.96],[15,0.881],[25,0.817],[50,0.687],[75,0.581],[100,0.502],[150,0.395],[200,0.335]],max:200,cal:12,mass:15,v0:285,drag:1.2},
+ "SMG-72 Pummeler":{fo:[[0,1],[5,0.96],[15,0.886],[25,0.818],[50,0.689],[75,0.582],[100,0.502],[150,0.395],[200,0.335]],max:200,cal:12,mass:15,v0:210,drag:1.2},
+ "M6C/SOCOM Pistol":{fo:[[0,1],[5,0.96],[15,0.881],[25,0.817],[50,0.687],[75,0.581],[100,0.502],[150,0.395],[200,0.335]],max:200,cal:12,mass:15,v0:285,drag:1.2},
+ "P-113 Verdict":{fo:[[0,1],[5,0.96],[15,0.881],[25,0.817],[50,0.687],[75,0.581],[100,0.502],[150,0.395],[200,0.335]],max:200,cal:12,mass:15,v0:285,drag:1.2},
+ "P-19 Redeemer":{fo:[[0,1],[5,0.938],[15,0.856],[25,0.786],[50,0.642],[75,0.53],[100,0.448],[150,0.353],[200,0.304]],max:200,cal:9,mass:7,v0:375,drag:1.2},
+ "P-2 Peacemaker":{fo:[[0,1],[5,0.948],[15,0.859],[25,0.786],[50,0.643],[75,0.53],[100,0.45],[150,0.353],[200,0.304]],max:200,cal:9,mass:7,v0:320,drag:1.2},
+ "P-4 Senator":{fo:[[0,1],[5,0.947],[15,0.885],[25,0.813],[50,0.681],[75,0.575],[100,0.498],[150,0.393],[200,0.334]],max:200,cal:12,mass:15,v0:550,drag:1.2},
+ "GP-20 Ultimatum":{fo:[[0,1],[5,0.985],[15,1.043],[25,1.11],[50,1.266]],max:50,cal:80,mass:500,v0:20,drag:0.5},
+ "GP-31 Grenade Pistol":{fo:[[0,1],[5,0.882],[15,0.689],[25,0.552],[50,0.379],[75,0.301],[100,0.27]],max:100,cal:40,mass:50,v0:100,drag:1.2},
+ "APW-1 Anti-Materiel Rifle":{fo:[[0,1],[5,0.997],[15,0.99],[25,0.983],[50,0.968],[75,0.951],[100,0.936],[150,0.908],[200,0.882]],max:200,cal:12.5,mass:52,v0:880,drag:0.3},
+ "RS-422 Railgun":{fo:[[0,1],[5,0.995],[15,0.99],[25,0.984],[50,0.978],[75,0.968],[100,0.958],[150,0.938],[200,0.919]],max:200,cal:10,mass:50,v0:2000,drag:0.3},
+ "MGX-42 Bullet Storm":{fo:[[0,1],[5,0.961],[15,0.891],[25,0.831],[50,0.699],[75,0.594],[100,0.516],[150,0.411],[200,0.346]],max:200,cal:9,mass:5,v0:450,drag:0.6},
+ "M-1000 Maxigun":{fo:[[0,1],[5,0.993],[15,0.981],[25,0.966],[50,0.938],[75,0.914],[100,0.885],[150,0.835],[200,0.787]],max:200,cal:8,mass:11,v0:920,drag:0.3},
+ "M-105 Stalwart":{fo:[[0,1],[5,0.993],[15,0.978],[25,0.962],[50,0.932],[75,0.898],[100,0.867],[150,0.81],[200,0.76]],max:200,cal:5.5,mass:4.5,v0:900,drag:0.3},
+ "MG-206 Heavy Machine Gun":{fo:[[0,1],[5,0.996],[15,0.989],[25,0.981],[50,0.968],[75,0.952],[100,0.936],[150,0.908],[200,0.882]],max:200,cal:12.5,mass:52,v0:980,drag:0.3},
+ "MG-43 Machine Gun":{fo:[[0,1],[5,0.994],[15,0.977],[25,0.969],[50,0.938],[75,0.91],[100,0.881],[150,0.833],[200,0.788]],max:200,cal:8,mass:11,v0:820,drag:0.3},
+ "AC-8 Autocannon — APHET":{fo:[[0,1],[5,0.996],[15,0.987],[25,0.982],[50,0.964],[75,0.946],[100,0.931],[150,0.9],[200,0.869]],max:200,cal:20,mass:120,v0:820,drag:0.3},
+ "GR-8 Recoilless Rifle — HEAT":{fo:[[0,1],[5,0.998],[15,0.993],[25,0.989],[50,0.977],[75,0.966],[100,0.955],[150,0.933],[200,0.912]],max:200,cal:85,mass:3300,v0:250,drag:0.3},
+ "EXO-49 Emancipator autocannon":{fo:[[0,1],[5,0.998],[15,0.993],[25,0.99],[50,0.98],[75,0.97],[100,0.962],[150,0.945],[200,0.927]],max:200,cal:40,mass:900,v0:1021,drag:0.3},
+ "AX/AR-23 Guard Dog":{fo:[[0,1],[5,0.994],[15,0.977],[25,0.969],[50,0.938],[75,0.91],[100,0.881],[150,0.833],[200,0.788]],max:200,cal:8,mass:11,v0:820,drag:0.3}
+};
+
+/* Categories the mechanic rules out, so a flat line is a real answer.
+   Beams carry only a range and a radius — no mass, velocity or drag exists for
+   them, so the velocity system that drives fall-off cannot apply. That is not
+   a blanket promise of flat damage: the Meltagun is a beam and still loses 40%
+   across its 15m because that loss is authored into the weapon. Guided rounds
+   lose speed but accelerate back to their initial velocity. Arcs have no
+   projectile data at all, only a hard cutoff. */
+const NO_FALLOFF = {
+ "FAF-14 Spear":"guided", "MLS-4X Commando":"guided", "P-33 Missile Pistol":"guided",
+ "StA-X3 W.A.S.P. — burst missile":"guided",
+ "R-36 Eruptor":"gyrojet",
+ "LAS-5 Scythe (per second)":"laser", "LAS-7 Dagger (per second)":"laser",
+ "LAS-13 Trident (per second)":"laser", "LAS-16 Sickle":"laser",
+ "LAS-17 Double-Edge Sickle — cold":"laser", "LAS-17 Double-Edge Sickle — 26% heat":"laser",
+ "LAS-17 Double-Edge Sickle — hot":"laser", "LAS-17 Double-Edge Sickle — 90% heat":"laser",
+ "LAS-58 Talon":"laser", "LAS-98 Laser Cannon (per second)":"laser",
+ "AX/LAS-5 Rover (per second)":"laser", "Orbital Laser (per second)":"laser",
+ "ARC-3 Arc Thrower":"arc", "GL-52 De-Escalator — arc":"arc", "G-31 Arc":"arc",
+ /* Sprays have no projectile either — same reasoning as beams. */
+ "P-72 Crisper (per tick)":"spray", "FLAM-40 Flamethrower (per tick)":"spray",
+ "FLAM-66 Torcher (per tick)":"spray", "B/FLAM-80 Cremator (per tick)":"spray",
+ "AX/FLAM-75 Hot Dog (per tick)":"spray", "AX/TX-13 Dog Breath (per tick)":"spray",
+ "Lumberer flamethrower (per tick)":"spray",
+ /* The wiki is explicit: fall-off applies to the projectile only, never to the
+    explosion it produces. A blast fades from where it detonates, which is a
+    different system and not a function of how far away the shooter stood. */
+ "AR/GL-21 One-Two — underbarrel grenade":"blast", "SG-8P Punisher Plasma — blast":"blast",
+ "AC-8 Autocannon — flak":"blast", "AC-8 Autocannon — shrapnel (one fragment)":"blast",
+ "RS-422 Railgun — overcharge blast":"blast", "GL-21 Grenade Launcher — blast":"blast",
+ "GL-28 Belt-Fed GL — blast":"blast", "GR-8 Recoilless Rifle — HE":"blast",
+ "EAT-700 Expendable Napalm":"blast", "EXO-45 Patriot missile":"blast",
+ "Lumberer anti-tank cannon":"blast",
+ /* Read off their own wiki pages: drag factor 0%, so no velocity is shed. */
+ "P/40-K Bolt Pistol":"zerodrag", "R/40-K Hot-Shot Marksman Rifle":"zerodrag"
+};
+
+/* One weapon the curve cannot express. The Ultimatum's round is so slow that
+   it GAINS damage falling under gravity — measured at 26.6% above its listed
+   damage by 50m, where its measurement also stops. */
+const RANGE_SOURCED = {
+ "40-K Meltagun":{max:15,fo:[[0,1],[15,0.6]],src:"curve",
+   note:"A beam, so no projectile physics applies — but the wiki states the loss outright: it bleeds damage steadily across its 15m and has lost 40% by the far end, dropping 3,640 a burst to about 2,180."}
+};
+
+const RANGE_CATEGORY = {
+ "Assault rifles":200, "Marksman rifles":300, "SMGs":100, "Shotguns":60,
+ "Energy weapons":200, "Sidearms":100, "Support weapons":250, "Anti-tank":300,
+ "Backpacks & exosuits":150,
+ "Grenades":null, "Eagle & orbital":null, "Mines":null
+};
+const RANGE_SHORT = {
+ "P-72 Crisper (per tick)":12, "FLAM-40 Flamethrower (per tick)":18,
+ "FLAM-66 Torcher (per tick)":16, "B/FLAM-80 Cremator (per tick)":22,
+ "AX/FLAM-75 Hot Dog (per tick)":16, "Lumberer flamethrower (per tick)":20,
+ "AX/TX-13 Dog Breath (per tick)":16, "SMG/FLAM-34 Stoker":16,
+ "LAS-7 Dagger (per second)":80, "AX/LAS-5 Rover (per second)":60,
+ "ARC-3 Arc Thrower":35, "GL-52 De-Escalator — arc":35, "G-31 Arc":15
+};
+
+WEAPONS.forEach(w=>{
+  const m = MEASURED[w.n];
+  w.phys   = m ? {cal:m.cal, mass:m.mass, v0:m.v0, drag:m.drag} : null;
+  w.noFall = NO_FALLOFF[w.n] || null;
+  const src = RANGE_SOURCED[w.n];
+  if(src){ w.rng = src; return; }
+  const cat = RANGE_CATEGORY[w.g];
+  if(cat === null){ w.rng = {max:0,fo:[[0,1]],src:"none",na:true}; return; }
+  w.rng = m        ? {max:m.max, fo:m.fo, src:"measured"}
+        : w.noFall ? {max: RANGE_SHORT[w.n] || cat || 150, fo:[[0,1]], src:"rule"}
+        :            {max: RANGE_SHORT[w.n] || cat || 150, fo:[[0,1]], src:"none"};
+});
+
+/* Damage multiplier at a given distance.
+   An explicit curve wins; otherwise it comes from the projectile's own drag and
+   mass; a weapon with neither is treated as flat and flagged as unknown. */
+function falloff(w,dist){
+  if(w.phys && !w.rng.fo){
+    if(!w.phys.drag) return 1;
+    return Math.exp(-DRAG_K * (w.phys.drag/100) * dist / w.phys.mass);
+  }
+  const fo = (w.rng && w.rng.fo) || [[0,1]];
+  if(dist <= fo[0][0]) return fo[0][1];
+  for(let i=1;i<fo.length;i++){
+    if(dist <= fo[i][0]){
+      const [x0,y0] = fo[i-1], [x1,y1] = fo[i];
+      return x1===x0 ? y1 : y0 + (y1-y0)*(dist-x0)/(x1-x0);
+    }
+  }
+  return fo[fo.length-1][1];
+}
+
+
+/* ===================== ENEMIES ===================== */
+const ENEMIES = [
+{n:"Warrior",f:"Terminid",main:325,mainAV:1,fireMult:0.8,fireLo:2.1,fireHi:3.3,fireSrc:"wiki",
+ note:"Challenging difficulty and above. On Medium and below it has 250 main, 110 head, 75 limbs.",
+ parts:[
+  {n:"Body (main)",hp:"main",av:1,dur:0.20,toMain:1.00,fatal:true},
+  {n:"Head",hp:150,av:1,dur:0.20,toMain:1.00,fatal:true,con:200,decay:70,note:"Losing the head triggers the berserk bleedout rather than an instant stop."},
+  {n:"Claw (of 2)",hp:100,av:1,dur:0,toMain:0.40,fatal:false},
+  {n:"Leg (of 4)",hp:100,av:1,dur:0,toMain:0.40,fatal:false}]},
+
+{n:"Hunter",f:"Terminid",main:160,mainAV:0,fireMult:0.6,fireLo:1.5,fireHi:2.4,fireSrc:"est",
+ note:"Challenging difficulty and above. On Medium and below it has 130 main and 45 on claws and legs.",
+ parts:[
+  {n:"Body (main)",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:40,av:0,dur:0,toMain:1.00,fatal:true,cap:true,note:"Unarmoured and tiny — almost anything one-shots it."},
+  {n:"Claw (of 2)",hp:60,av:0,dur:0,toMain:0.40,fatal:false},
+  {n:"Leg (of 4)",hp:60,av:0,dur:0,toMain:0.50,fatal:false,note:"Breaking legs stops it pouncing and slows it badly."},
+  {n:"Wing (of 2)",hp:20,av:0,dur:0,toMain:0.30,fatal:false,note:"Shooting the wings off also prevents the pounce."}]},
+
+{n:"Brood Commander",f:"Terminid",main:800,mainAV:2,fireMult:1.0,fireLo:3.0,fireHi:4.8,fireSrc:"mixed",
+ note:"Lightly armoured but 60% durable on the body, so it soaks far more small-arms fire than its armour class suggests.",
+ parts:[
+  {n:"Main",hp:"main",av:2,dur:0.60,toMain:1.00,fatal:true},
+  {n:"Head",hp:200,av:2,dur:0.60,toMain:0.50,fatal:true,con:300,decay:75,note:"Decapitation starts a berserk bleedout it can survive long enough to reach you — often not worth it."},
+  {n:"Claw (of 2)",hp:200,av:2,dur:0.50,toMain:0.50,fatal:false},
+  {n:"Leg (of 4)",hp:170,av:1,dur:0.40,toMain:0.60,fatal:false,note:"The only unarmoured part. Each leg lost slows it further, including its charge."}]},
+
+{n:"Charger",f:"Terminid",main:2400,mainAV:4,fireMult:1.5,fireLo:5,fireHi:8,fireSrc:"mixed",
+ note:"Main health carries 750 constitution bleeding at 100/s, so emptying main downs it and it bleeds out.",
+ parts:[
+  {n:"Head",hp:1200,av:4,dur:0.75,toMain:0.70,fatal:true},
+  {n:"Butt",hp:950,av:0,dur:0.80,toMain:1.50,fatal:true,note:"Unarmoured but 80% durable, so durable damage is what counts. Destroying it downs the Charger."},
+  {n:"Torso armour (of 2)",hp:800,av:4,dur:0.85,toMain:1.00,fatal:false,armor:true},
+  {n:"Inner flesh",hp:"main",av:1,dur:0.30,toMain:3.00,fatal:true,requires:"torso armour",note:"300% transfer to main — by far the fastest kill once exposed."},
+  {n:"Underside",hp:"main",av:2,dur:1.00,toMain:1.00,fatal:true},
+  {n:"Rear armour plates",hp:2200,av:4,dur:0.75,toMain:0.75,fatal:true},
+  {n:"Front leg armour (of 2)",hp:800,av:4,dur:0.70,toMain:0.60,fatal:false,armor:true},
+  {n:"Rear leg armour (of 2)",hp:800,av:4,dur:0.70,toMain:0.50,fatal:false,armor:true},
+  {n:"Leg flesh (of 4)",hp:800,av:2,dur:0.70,toMain:0.50,fatal:true,requires:"that leg's armour"},
+  {n:"Claw (of 2)",hp:500,av:4,dur:0.70,toMain:0.70,fatal:false}]},
+
+{n:"Impaler",f:"Terminid",main:4000,mainAV:4,fireMult:1.7,fireLo:5,fireHi:8,fireSrc:"mixed",
+ note:"The head is only exposed while the tentacles are burrowed. That window is the whole fight — AV1 and 150% transfer to main.",
+ parts:[
+  {n:"Main",hp:"main",av:4,dur:1.00,toMain:1.00,fatal:true},
+  {n:"Head",hp:1250,av:1,dur:0.75,toMain:1.50,fatal:true,note:"Unarmoured and fatal at 150% transfer — only reachable while it has its tentacles out."},
+  {n:"Inner flesh",hp:"main",av:0,dur:0.90,toMain:1.50,fatal:true,cap:true,requires:"torso armour",note:"Breaking the head armour also destroys the right torso plate, exposing this."},
+  {n:"Underside",hp:"main",av:2,dur:1.00,toMain:1.50,fatal:true,cap:true,note:"150% transfer at AV2, but fully durable — heavy weapons only."},
+  {n:"Crest armour",hp:1000,av:4,dur:0.80,toMain:0.75,fatal:false,cap:true,armor:true},
+  {n:"Torso armour (of 2)",hp:1000,av:4,dur:0.75,toMain:0.75,fatal:false,cap:true,armor:true},
+  {n:"Rear armour plates",hp:1000,av:4,dur:0.75,toMain:0.75,fatal:false,cap:true,armor:true},
+  {n:"Butt",hp:1100,av:3,dur:0.85,toMain:1.40,fatal:false,note:"140% transfer at only AV3 — the best medium-pen angle when the head is hidden."},
+  {n:"Leg armour (of 4)",hp:1000,av:4,dur:0.70,toMain:0.50,fatal:false,armor:true},
+  {n:"Leg flesh (of 4)",hp:1000,av:0,dur:0.70,toMain:0.50,fatal:true,requires:"that leg's armour",note:"Unarmoured and fatal once exposed — machine guns chew through it."},
+  {n:"Tentacle armour (of 3)",hp:"main",av:4,dur:0.75,toMain:1.00,fatal:false,cap:true},
+  {n:"Tentacle flesh (of 3)",hp:500,av:1,dur:0.70,toMain:0.50,fatal:false,note:"Enough damage forces the tentacle to retract — useful to break an incoming hit."}]},
+
+{n:"Bile Titan",f:"Terminid",main:6500,mainAV:4,fireMult:1.7,fireLo:6,fireHi:10,fireSrc:"mixed",
+ parts:[
+  {n:"Head",hp:1500,av:4,dur:0.95,toMain:1.00,fatal:true},
+  {n:"Torso armour (of 2)",hp:1500,av:4,dur:1.00,toMain:1.00,fatal:false,armor:true},
+  {n:"Inner flesh",hp:"main",av:0,dur:0.70,toMain:1.00,fatal:true,requires:"torso armour",note:"Completely unarmoured once exposed."},
+  {n:"Butt armour",hp:3500,av:4,dur:1.00,toMain:1.00,fatal:true,cap:true},
+  {n:"Upper bile sac",hp:750,av:0,dur:1.00,toMain:1.00,fatal:false,cap:true,note:"Popping both sacs stops the bile spew but doesn't kill."},
+  {n:"Lower bile sac",hp:750,av:0,dur:1.00,toMain:1.00,fatal:false,cap:true},
+  {n:"Underside",hp:4000,av:2,dur:0.80,toMain:0.60,fatal:true},
+  {n:"Leg armour (of 12)",hp:1000,av:4,dur:1.00,toMain:1.00,fatal:false,armor:true},
+  {n:"Front left leg flesh",hp:2000,av:4,dur:1.00,toMain:1.00,fatal:true,con:1500,decay:0,requires:"that leg's armour"},
+  {n:"Leg flesh (other 3)",hp:2000,av:4,dur:1.00,toMain:1.00,fatal:true,con:2000,decay:0,requires:"that leg's armour"},
+  {n:"Claw (of 2)",hp:1000,av:4,dur:0,toMain:1.00,fatal:false}]},
+
+{n:"Trooper",f:"Automaton",main:125,mainAV:0,fireMult:0.8,fireLo:3,fireHi:5,fireSrc:"est",
+ note:"The Raider variant uses the same body. Every light Automaton carries a flare gun — killing it before the flare finishes cancels the bot drop.",
+ parts:[
+  {n:"Body (main)",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:40,av:0,dur:0,toMain:1.00,fatal:true,cap:true,note:"Headshots reliably one-shot every light Automaton."},
+  {n:"Torso",hp:100,av:0,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Leg (of 2)",hp:90,av:0,dur:0,toMain:0.65,fatal:true,cap:true},
+  {n:"Arm (of 2)",hp:65,av:0,dur:0,toMain:0.50,fatal:false,note:"Blowing off the gun arm forces it into melee."}]},
+
+{n:"Berserker",f:"Automaton",main:750,mainAV:0,fireMult:1.0,fireLo:4,fireHi:6.5,fireSrc:"est",
+ note:"Every part is explosion-immune, so blast weapons only ever chip the main pool. The chest is the one durable part — avoid it with light-pen weapons.",
+ parts:[
+  {n:"Main",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:110,av:1,dur:0,toMain:1.00,fatal:true,cap:true,note:"Its lowest-health part, but it bobs around as it closes — stun it first."},
+  {n:"Stomach",hp:350,av:1,dur:0,toMain:1.00,fatal:true,cap:true,note:"The glowing gut: bigger and easier to hit than the head, and just as fatal."},
+  {n:"Chest",hp:425,av:2,dur:0.40,toMain:1.00,fatal:true,cap:true,note:"The only part with durability and the only armoured one — the worst place to aim light-pen fire."},
+  {n:"Pelvis",hp:600,av:1,dur:0,toMain:0.65,fatal:true,cap:true},
+  {n:"Leg (of 2)",hp:750,av:1,dur:0.30,toMain:0,fatal:true,cap:true,note:"Nothing transfers to main, but a destroyed leg kills it outright."},
+  {n:"Arm (of 2)",hp:260,av:1,dur:0.30,toMain:0.50,fatal:false,cap:true},
+  {n:"Shoulder (of 2)",hp:180,av:0,dur:0,toMain:0,fatal:false,cap:true}]},
+
+{n:"Devastator",f:"Automaton",main:750,mainAV:2,fireMult:1.0,fireLo:4,fireHi:6.5,fireSrc:"est",
+ note:"Rocket and Heavy Devastators share this body; the Heavy adds a separate AV4 shield.",
+ parts:[
+  {n:"Head",hp:110,av:1,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Stomach",hp:350,av:1,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Torso",hp:425,av:3,dur:0.30,toMain:1.00,fatal:true,cap:true,note:"Medium armour — light-penetration weapons bounce off the torso plate."},
+  {n:"Pelvis",hp:500,av:2,dur:0,toMain:0.75,fatal:true,cap:true},
+  {n:"Leg (of 2)",hp:500,av:2,dur:0.30,toMain:0.60,fatal:true,cap:true},
+  {n:"Arm (of 2)",hp:260,av:1,dur:0,toMain:0.50,fatal:false},
+  {n:"Shoulder (of 2)",hp:150,av:2,dur:0,toMain:0.25,fatal:false}]},
+
+{n:"Heavy Devastator",f:"Automaton",main:750,mainAV:2,fireMult:1.0,fireLo:4,fireHi:6.5,fireSrc:"est",
+ note:"Ballistic fire into the shield does nothing to the bot behind it. Explosions stagger it into dropping guard, and the backpack is fatal from any angle behind.",
+ parts:[
+  {n:"Main",hp:"main",av:2,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:110,av:1,dur:0,toMain:1.00,fatal:true,cap:true,note:"Only 110 health at AV1 — most marksman rifles and sidearms one-shot it."},
+  {n:"Torso",hp:425,av:3,dur:0.30,toMain:1.00,fatal:true,cap:true},
+  {n:"Stomach",hp:350,av:1,dur:0,toMain:1.00,fatal:true,cap:true,note:"Soft and fatal, but usually hidden behind the shield."},
+  {n:"Pelvis",hp:500,av:2,dur:0,toMain:0.75,fatal:true,cap:true},
+  {n:"Leg (of 2)",hp:500,av:2,dur:0.30,toMain:0.60,fatal:true,cap:true},
+  {n:"Backpack",hp:600,av:2,dur:0,toMain:0.40,fatal:true,cap:true,note:"AV2 and fatal — the reward for flanking. Any weapon can damage it."},
+  {n:"Arm (of 2)",hp:260,av:1,dur:0,toMain:0.50,fatal:false,note:"Shooting the gun arm off is the fallback when you can't land a headshot."},
+  {n:"Shoulder (of 2)",hp:150,av:2,dur:0,toMain:0.25,fatal:false},
+  {n:"Shield",hp:800,av:4,dur:0.70,toMain:0,fatal:false,armor:true,note:"AV4 and 70% durable. Destroying it makes the bot drop it, but nothing transfers through."}]},
+
+{n:"Hulk Obliterator",f:"Automaton",main:1800,mainAV:4,fireMult:1.5,fireLo:9,fireHi:14,fireSrc:"mixed",
+ note:"Bruiser, Scorcher and Firebomber Hulks share this chassis.",
+ parts:[
+  {n:"Eye slit (head)",hp:250,av:4,dur:0.25,toMain:1.00,fatal:true,cap:true,note:"The glowing red eye. Only 250 health at 25% durability and destroying it kills the Hulk outright — but it is still AV4, so anything below Heavy penetration bounces no matter how precisely you hit it. The Anti-Materiel Rifle, Railgun and Speargun each take it off in one shot."},
+  {n:"Main (body)",hp:"main",av:4,dur:0.60,toMain:1.00,fatal:true},
+  {n:"Heatsink (back)",hp:900,av:1,dur:0.60,toMain:0.60,fatal:true,cap:true,con:650,decay:50,note:"The only unarmoured spot on the chassis. Destroying it starts a bleedout."},
+  {n:"Leg (of 2)",hp:500,av:4,dur:0.80,toMain:0.80,fatal:false,con:500,decay:0,note:"Zero-decay constitution gives each leg 1,000 effective health. Both legs down kills it."},
+  {n:"Arm (of 2)",hp:500,av:4,dur:0.70,toMain:0.80,fatal:false}]},
+
+{n:"Gunship",f:"Automaton",main:950,mainAV:3,fireMult:1.0,fireLo:5,fireHi:8,fireSrc:"est",
+ note:"Destroying any single component brings the whole Gunship down, so concentrate fire on one part rather than spreading it.",
+ parts:[
+  {n:"Main",hp:"main",av:3,dur:0,toMain:1.00,fatal:true},
+  {n:"Fuselage",hp:"main",av:3,dur:1.00,toMain:1.00,fatal:true,cap:true,note:"Fully durable and explosion-immune — only high durable-damage direct fire works here."},
+  {n:"Front thruster (of 2)",hp:400,av:3,dur:0.85,toMain:0,fatal:true,cap:true,note:"Fatal on its own at only 400 health. The easiest target since the Gunship faces you."},
+  {n:"Rear thruster (of 2)",hp:400,av:3,dur:0.80,toMain:0,fatal:true,cap:true,note:"Slightly less durable than the front pair, but harder to line up."}]},
+
+{n:"Factory Strider (intact)",f:"Automaton",main:10000,mainAV:4,fireMult:1.7,fireLo:12,fireHi:20,fireSrc:"est",
+ note:"Nearly every plate is AV5, so only Anti-Tank I and above touches the exterior. The belly panels are the softest fatal target at AV3.",
+ parts:[
+  {n:"Main",hp:"main",av:4,dur:1.00,toMain:1.00,fatal:true},
+  {n:"Head armour",hp:1500,av:5,dur:1.00,toMain:0.30,fatal:false,cap:true,armor:true,note:"One Recoilless-class hit strips it and exposes the AV4 head body."},
+  {n:"Head body",hp:2500,av:4,dur:1.00,toMain:1.00,fatal:true},
+  {n:"Neck armour",hp:1500,av:5,dur:1.00,toMain:0.30,fatal:false,cap:true,armor:true},
+  {n:"Neck",hp:2500,av:4,dur:1.00,toMain:1.00,fatal:true},
+  {n:"Cannon turret",hp:900,av:5,dur:1.00,toMain:0,fatal:false,note:"Low health but AV5 — needs Anti-Tank I to silence the repeater cannon."},
+  {n:"Fusion gatling gun (of 2)",hp:300,av:3,dur:1.00,toMain:0,fatal:false,note:"Only AV3 — an Autocannon or AMR strips both quickly. Do this before going for the belly."},
+  {n:"Front top armour",hp:2200,av:5,dur:1.00,toMain:0.30,fatal:false,cap:true,armor:true},
+  {n:"Front engine weakspot",hp:2000,av:4,dur:1.00,toMain:1.00,fatal:false,cap:true},
+  {n:"Front armour",hp:2200,av:5,dur:1.00,toMain:0.30,fatal:false,cap:true,armor:true},
+  {n:"Side armour (of 2)",hp:2200,av:5,dur:1.00,toMain:0.30,fatal:false,cap:true,armor:true},
+  {n:"Rear engine armour",hp:2200,av:5,dur:1.00,toMain:0.50,fatal:false,cap:true,armor:true},
+  {n:"Rear engine weakspot",hp:1500,av:3,dur:0.75,toMain:1.00,fatal:false,cap:true,note:"AV3 and only 75% durable — the one exterior spot medium-pen weapons can work on."},
+  {n:"Rear armour",hp:2200,av:5,dur:1.00,toMain:0.30,fatal:false,cap:true,armor:true},
+  {n:"Leg armour (of 8)",hp:1500,av:5,dur:1.00,toMain:0.30,fatal:false,cap:true,armor:true},
+  {n:"Knee armour (of 4)",hp:800,av:5,dur:1.00,toMain:0.20,fatal:false,cap:true,armor:true},
+  {n:"Leg assembly (of 4)",hp:1500,av:4,dur:1.00,toMain:0.40,fatal:true,cap:true,con:2000,decay:0,note:"Zero-decay constitution makes each leg 3,500 effective health."},
+  {n:"Belly panel (of 2)",hp:1200,av:3,dur:1.00,toMain:1.00,fatal:true,con:1200,decay:0,note:"2,400 effective health at AV3 and 100% transfer — the fastest medium-pen kill, but you have to stand under it."},
+  {n:"Stratagem scrambler",hp:5000,av:0,dur:0,toMain:0,fatal:false,note:"Unarmoured, and only carried by the one Strider in a convoy."}]},
+
+{n:"Factory Strider (armour broken)",f:"Automaton",main:10000,mainAV:4,fireMult:1.7,fireLo:12,fireHi:20,fireSrc:"est",
+ note:"Stats for the exposed internals once the corresponding plate is gone. Everything here is fatal.",
+ parts:[
+  {n:"Head body",hp:2500,av:4,dur:1.00,toMain:1.00,fatal:true,requires:"head armour"},
+  {n:"Neck",hp:2500,av:4,dur:1.00,toMain:1.00,fatal:true,requires:"neck armour"},
+  {n:"Front circuits",hp:1200,av:3,dur:1.00,toMain:0.50,fatal:true,con:1200,decay:0,requires:"front armour"},
+  {n:"Side circuits (of 2)",hp:1200,av:3,dur:1.00,toMain:1.00,fatal:true,con:1200,decay:0,requires:"that side's armour"},
+  {n:"Rear circuits",hp:1200,av:3,dur:1.00,toMain:1.00,fatal:true,con:1200,decay:0,requires:"rear armour"},
+  {n:"Leg assembly (of 4)",hp:1500,av:4,dur:1.00,toMain:0.40,fatal:true,cap:true,con:2000,decay:0,requires:"that leg's armour"}]},
+
+{n:"Overseer",f:"Illuminate",main:600,mainAV:0,fireMult:1.0,fireLo:3.5,fireHi:5.5,fireSrc:"est",
+ parts:[
+  {n:"Head",hp:150,av:3,dur:0,toMain:1.00,fatal:true,cap:true,note:"Medium-armoured helmet over the softest part of the body."},
+  {n:"Torso (armour off)",hp:600,av:1,dur:0,toMain:1.00,fatal:true,cap:true,requires:"chest armour"},
+  {n:"Right arm",hp:300,av:1,dur:0,toMain:0.50,fatal:true,cap:true},
+  {n:"Left arm",hp:300,av:1,dur:0,toMain:0.50,fatal:false,cap:true},
+  {n:"Leg (of 2)",hp:"main",av:0,dur:0,toMain:0.70,fatal:false,note:"Unarmoured and never covered by the shield — reliable while it's blocking."},
+  {n:"Chest armour",hp:150,av:2,dur:0,toMain:0.20,fatal:false,armor:true},
+  {n:"Crotch armour",hp:200,av:2,dur:0,toMain:0.20,fatal:false,armor:true},
+  {n:"Limb armour (of 8)",hp:100,av:2,dur:0,toMain:0.20,fatal:false,armor:true},
+  {n:"Energy shield",hp:1500,av:2,dur:0,toMain:0,fatal:false,armor:true,note:"Passes nothing through to the Overseer itself."}]},
+
+{n:"Voteless (light)",f:"Illuminate",main:100,mainAV:0,fireMult:0.6,fireLo:1.5,fireHi:2.4,fireSrc:"est",
+ parts:[
+  {n:"Body (main)",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:40,av:1,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Legs",hp:80,av:0,dur:0,toMain:0.30,fatal:true,cap:true,note:"Some Voteless keep crawling after losing their legs."},
+  {n:"Upper arm (of 2)",hp:50,av:0,dur:0,toMain:0.40,fatal:false,cap:true,con:1000,decay:40},
+  {n:"Forearm (of 2)",hp:50,av:0,dur:0,toMain:0.30,fatal:false}]},
+
+{n:"Voteless (medium)",f:"Illuminate",main:130,mainAV:0,fireMult:0.6,fireLo:1.5,fireHi:2.4,fireSrc:"est",
+ parts:[
+  {n:"Body (main)",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:50,av:1,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Legs",hp:80,av:0,dur:0,toMain:0.30,fatal:true,cap:true},
+  {n:"Upper arm (of 2)",hp:65,av:0,dur:0,toMain:0.40,fatal:false,cap:true,con:1000,decay:40},
+  {n:"Forearm (of 2)",hp:50,av:0,dur:0,toMain:0.30,fatal:false}]},
+
+{n:"Voteless (heavy)",f:"Illuminate",main:160,mainAV:0,fireMult:0.6,fireLo:1.5,fireHi:2.4,fireSrc:"est",
+ parts:[
+  {n:"Body (main)",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:60,av:1,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Legs",hp:80,av:0,dur:0,toMain:0.30,fatal:true,cap:true},
+  {n:"Upper arm (of 2)",hp:80,av:0,dur:0,toMain:0.40,fatal:false,cap:true,con:1000,decay:40},
+  {n:"Forearm (of 2)",hp:65,av:0,dur:0,toMain:0.30,fatal:false}]},
+
+{n:"Harvester (shield up)",f:"Illuminate",main:3000,mainAV:4,fireMult:1.5,fireLo:8,fireHi:13,fireSrc:"est",
+ note:"Every exterior part is explosion-immune until the carapace breaks, so pure-blast weapons below Heavy AP do nothing.",
+ parts:[
+  {n:"Energy shield",hp:1500,av:0,dur:0,toMain:0,fatal:false,armor:true,note:"Absorbs any single instance of damage and regenerates. Kill a shield generator to disable it for good."},
+  {n:"Shield generator (of 3)",hp:350,av:3,dur:0,toMain:0.10,fatal:false,note:"Only one of the three prongs needs to go to stop the shield permanently."},
+  {n:"Eye",hp:350,av:2,dur:0,toMain:1.20,fatal:false,note:"120% transfer to main, and overkill carries through — a Recoilless to the eye can end it outright."},
+  {n:"Chassis",hp:2000,av:4,dur:0.75,toMain:1.00,fatal:true,cap:true},
+  {n:"Carapace (of 2)",hp:800,av:4,dur:0.75,toMain:1.00,fatal:false,armor:true},
+  {n:"Carapace weakspot (of 2)",hp:500,av:1,dur:0.80,toMain:1.00,fatal:false},
+  {n:"Left hip joint",hp:1000,av:3,dur:0.70,toMain:0.45,fatal:true,cap:true},
+  {n:"Right / middle hip joint",hp:1000,av:3,dur:0.70,toMain:0.60,fatal:true,cap:true,note:"Medium armour on a fatal part — the reliable target for machine guns."},
+  {n:"Left upper thigh armour",hp:600,av:4,dur:0.75,toMain:0.30,fatal:false,armor:true},
+  {n:"Right / middle thigh armour",hp:900,av:4,dur:0.75,toMain:0.30,fatal:false,armor:true},
+  {n:"Lower thigh armour (of 3)",hp:900,av:4,dur:0.75,toMain:0.30,fatal:false,armor:true},
+  {n:"Shin armour (of 3)",hp:900,av:4,dur:0.75,toMain:0.30,fatal:false,armor:true},
+  {n:"Left foot armour",hp:900,av:4,dur:0,toMain:0.30,fatal:false,armor:true},
+  {n:"Right / middle foot armour",hp:900,av:4,dur:0.75,toMain:0.30,fatal:false,armor:true},
+  {n:"Exposed leg internals",hp:1000,av:3,dur:0.25,toMain:0.60,fatal:true,cap:true,requires:"the leg armour"}]},
+
+{n:"Harvester (armour broken)",f:"Illuminate",main:3000,mainAV:4,fireMult:1.5,fireLo:8,fireHi:13,fireSrc:"est",
+ parts:[
+  {n:"Damaged chassis",hp:2000,av:4,dur:0.75,toMain:1.00,fatal:true,cap:true},
+  {n:"Internals (of 2)",hp:800,av:2,dur:0.50,toMain:1.00,fatal:true,cap:true,note:"Light armour on a fatal part once the carapace is off."},
+  {n:"Right / left upper leg internals (of 3)",hp:1000,av:3,dur:0.25,toMain:0.45,fatal:true,cap:true},
+  {n:"Middle upper leg internals",hp:1000,av:3,dur:0.25,toMain:0.60,fatal:true,cap:true},
+  {n:"Lower leg internals (of 3)",hp:1000,av:3,dur:0.25,toMain:0.60,fatal:true,cap:true}]}
+];
+
+/* ---------------- damage model ----------------
+   A trigger pull is a list of damage instances. Impact lands first, then the
+   blast, then any shrapnel. Each instance carries its own AP and is checked
+   against the part separately, so a round can punch through with one component
+   and bounce with another — an Ultimatum into heavy armour lands both, an
+   Eruptor into an AV4 plate lands the impact and bounces the AV3 blast. */
+function perShot(src,p){
+  if(src.ap < p.av) return {dmg:0,mult:0,raw:0,blocked:true};
+  const mult = src.ap > p.av ? 1 : 0.65;
+  const raw  = src.d*(1-p.dur) + src.dur*p.dur;
+  return {dmg:Math.floor(raw*mult),mult,raw,blocked:false};
+}
+
+/* ---------------- fire / burn over time ----------------
+   Burning is a status, not a damage instance on the round. Every impact adds
+   its status strength to a buildup meter; once that meter passes the target's
+   ignition threshold the target catches, and burning then ticks for a fixed
+   duration regardless of what the weapon does next.
+
+   The wiki pins down three things: burning deals 100 per second, it does the
+   same damage to durable parts as to standard ones (100/100, so durability is
+   irrelevant to it), it penetrates at AP4, and an unmodified burn lasts three
+   seconds. Each enemy then scales the result by its own fire multiplier.
+   Burning ticks against the MAIN health pool, not the part you are aiming at. */
+const FIRE = {dps:100, ap:4, dur:3};
+
+/* Damage one second of burning does to this enemy's main pool. */
+function firePerSecond(enemy){
+  const av = enemy.mainAV;
+  const mult = FIRE.ap < av ? 0 : (FIRE.ap === av ? 0.65 : 1);
+  return {mult, dps: Math.floor(FIRE.dps * (enemy.fireMult ?? 1) * mult)};
+}
+
+/* Impacts needed to push the buildup meter past the ignition threshold.
+   lo = the point where it may catch, hi = the point where it is guaranteed. */
+function shotsToIgnite(w,enemy,hitPel){
+  if(!w.fire) return null;
+  const perPull = w.fire.str * (w.pel ? hitPel : 1);
+  if(perPull <= 0) return null;
+  return {
+    perPull,
+    min: Math.ceil((enemy.fireLo ?? 3) / perPull),
+    max: Math.ceil((enemy.fireHi ?? 5) / perPull)
+  };
+}
+
+/* Break a weapon down into the instances one trigger pull produces. */
+function components(w,hitPel,hitFrag,rngMult){
+  const list=[], pel=w.pel||1, m = (rngMult === undefined ? 1 : rngMult);
+  const impactLabel = pel>1 ? "Pellet" : (w.t==="explosion" ? "Blast" : "Impact");
+  /* Falloff is velocity-based, so it applies to the projectile itself. A blast
+     and its fragments fall off from where the round detonates, not from how far
+     away the shooter is standing, so they are left alone. */
+  list.push({key:"impact",label:impactLabel,d:w.d*m,dur:w.dur*m,ap:w.ap,n:pel>1?hitPel:1,max:pel});
+  if(w.blast) list.push({key:"blast",label:"Blast",d:w.blast.d,dur:w.blast.dur,ap:w.blast.ap,n:1,max:1});
+  if(w.frag)  list.push({key:"frag",label:"Shrapnel",d:w.frag.d,dur:w.frag.dur,ap:w.frag.ap,n:hitFrag,max:w.frag.n});
+  return list;
+}
+
+function simulate(w,enemy,part,hitPel,hitFrag,burn,rngMult){
+  const comps = components(w,hitPel,hitFrag,rngMult).map(c=>Object.assign({},c,perShot(c,part)));
+  const live  = comps.filter(c=>!c.blocked && c.dmg>0 && c.n>0);
+  const perPull = live.reduce((t,c)=>t+c.dmg*c.n,0);
+  if(!live.length) return {pulls:Infinity,comps,live,perPull:0,reason:"blocked"};
+
+  const pool = part.hp === "main" ? null : part.hp + (part.decay === 0 ? (part.con||0) : 0);
+  const cap  = part.cap ? (part.hp === "main" ? Infinity : part.hp + (part.con||0)) : Infinity;
+  /* Burning eats the main pool before the shots do. It never touches the part
+     you are aiming at, so a kill that depends on destroying a fatal part is
+     completely unaffected by it. */
+  let hp = pool, main = enemy.main - (burn||0), toMainTotal = 0, pulls = 0, instances = 0;
+  if(main <= 0) return {pulls:0,instances:0,breakPull:null,comps,live,perPull,reason:"burn"};
+  let breakPull = null;   /* pull on which the part itself is destroyed */
+
+  while(pulls < 20000){
+    pulls++;
+    for(const c of live){
+      for(let k=0;k<c.n;k++){
+        instances++;
+        let mh = c.dmg * part.toMain;
+        if(part.cap) mh = Math.min(mh, Math.max(0, cap - toMainTotal));
+        toMainTotal += mh; main -= mh;
+        if(hp !== null){
+          hp -= c.dmg;
+          if(hp <= 0 && breakPull === null) breakPull = pulls;
+          if(hp <= 0 && part.fatal) return {pulls,instances,breakPull,comps,live,perPull,reason:"part"};
+        }
+        if(main <= 0) return {pulls,instances,breakPull,comps,live,perPull,reason:"main"};
+      }
+    }
+    /* part is gone, isn't fatal, and nothing more can reach main */
+    if(hp !== null && hp <= 0 && !part.fatal &&
+       (part.toMain === 0 || (part.cap && toMainTotal >= cap)))
+      return {pulls:breakPull,instances,breakPull,comps,live,perPull,
+              toMainTotal,reason:"stall"};
+  }
+  return {pulls:Infinity,instances,breakPull,comps,live,perPull,reason:"stall"};
+}
+
+/* ---------------- range chart ----------------
+   Plots what one trigger pull actually lands on the selected part, from
+   muzzle out to the weapon's outer limit, with a marker at the range the
+   slider is set to. */
+function drawRangeChart(w,p,hitPel,hitFrag,dist){
+  const host = $("rangeChart"), note = $("rangeNote");
+  if(w.rng.na || !w.rng.max){
+    host.innerHTML = `<div class="chartna">Distance from the thrower isn't what governs this one — ` +
+      `blast damage falls off from where it detonates, which this tool doesn't model.</div>`;
+    note.innerHTML = ""; return;
+  }
+  const max = w.rng.max, W = 620, H = 210, L = 58, R = 16, T = 16, B = 34;
+  const N = 80, pts = [];
+  for(let i=0;i<=N;i++){
+    const d = max*i/N;
+    const cs = components(w,hitPel,hitFrag,falloff(w,d)).map(c=>Object.assign({},c,perShot(c,p)));
+    pts.push([d, cs.filter(c=>!c.blocked).reduce((t,c)=>t+c.dmg*c.n,0)]);
+  }
+  const ymax = Math.max(1, ...pts.map(q=>q[1])) * 1.12;
+  const X = d => L + (W-L-R)*(d/max);
+  const Y = v => T + (H-T-B)*(1 - v/ymax);
+  const path = pts.map((q,i)=>(i?"L":"M")+X(q[0]).toFixed(1)+" "+Y(q[1]).toFixed(1)).join(" ");
+  const area = path + ` L ${X(max).toFixed(1)} ${Y(0).toFixed(1)} L ${X(0).toFixed(1)} ${Y(0).toFixed(1)} Z`;
+
+  const xticks = [0,.25,.5,.75,1].map(f=>Math.round(max*f));
+  const yticks = [0,.5,1].map(f=>Math.round(ymax*f/10)*10);
+  const here = pts.reduce((a,b)=>Math.abs(b[0]-dist)<Math.abs(a[0]-dist)?b:a);
+
+  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Damage against distance">
+    ${yticks.map(v=>`<line x1="${L}" x2="${W-R}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}"
+        stroke="#333a45" stroke-width="1"/>
+      <text x="${L-8}" y="${(Y(v)+4).toFixed(1)}" fill="#78818e" font-size="11"
+        font-family="ui-monospace,monospace" text-anchor="end">${v}</text>`).join("")}
+    ${xticks.map(d=>`<text x="${X(d).toFixed(1)}" y="${H-12}" fill="#78818e" font-size="11"
+        font-family="ui-monospace,monospace" text-anchor="middle">${d}m</text>`).join("")}
+    <path d="${area}" fill="#ffd21e" fill-opacity="0.07"/>
+    <path d="${path}" fill="none" stroke="#ffd21e" stroke-width="2"/>
+    <line x1="${X(here[0]).toFixed(1)}" x2="${X(here[0]).toFixed(1)}" y1="${T}" y2="${H-B}"
+      stroke="#e0413a" stroke-width="1" stroke-dasharray="4 4"/>
+    <circle cx="${X(here[0]).toFixed(1)}" cy="${Y(here[1]).toFixed(1)}" r="4" fill="#e0413a"/>
+    <text x="${(X(here[0])+(here[0]>max*0.7?-8:8)).toFixed(1)}" y="${(Y(here[1])-10).toFixed(1)}"
+      fill="#e0413a" font-size="12" font-family="ui-monospace,monospace"
+      text-anchor="${here[0]>max*0.7?"end":"start"}">${Math.round(here[1])} at ${Math.round(here[0])}m</text>
+    <line x1="${L}" x2="${W-R}" y1="${(H-B).toFixed(1)}" y2="${(H-B).toFixed(1)}" stroke="#78818e"/>
+  </svg>`;
+
+  const ph = w.phys;
+  const RULE = {
+    guided:"a guided round. Guided projectiles lose speed but accelerate back to their initial velocity, so no damage is lost at any distance.",
+    gyrojet:"a gyro-jet, listed at 0% drag — it loses nothing with distance.",
+    laser:"a beam. Beams carry only a range and a radius, with no mass, velocity or drag, so the velocity system that causes fall-off cannot apply. A beam can still have a loss authored into it, as the Meltagun does, but nothing here says so.",
+    arc:"an arc, which has no projectile data at all — just a hard cutoff at its range.",
+    spray:"a spray. Like a beam it fires no discrete projectile, so there is no velocity to shed and the fall-off system never touches it; what limits it is the reach of the flame.",
+    blast:"an explosion, and the wiki is explicit that fall-off applies to the projectile only, never to the blast it produces. A blast does fade, but from where it detonates rather than from where you were standing, and that is a separate system this tool doesn't model.",
+    zerodrag:"a 0% drag factor, read off its own wiki page. Damage only drops when velocity drops, and this loses none."
+  };
+  note.innerHTML =
+    w.rng.src === "measured"
+      ? `<em>Measured, not modelled.</em> Range-tested at eight fixed distances to within about 0.3%.
+         Calibre ${ph.cal}, ${ph.mass}g at ${ph.v0} m/s, drag ${ph.drag}. Keeps
+         <b>${Math.round(falloff(w,max)*100)}%</b> of its damage at ${max}m, the furthest point measured.`
+   : w.rng.src === "curve"
+      ? `<em>Stated by the wiki.</em> ${w.rng.note||""}`
+   : w.rng.src === "rule"
+      ? `<em>Ruled out by the mechanic.</em> This is ${RULE[w.noFall]} Flat here is a real answer, not a gap.`
+      : `<em>Not in the measured dataset.</em> That dataset covers 77 weapons and this is not one of
+         them, so the line is flat by default rather than by evidence. Most of the unmeasured
+         entries here are explosion, spray or fragment rows, where the blast is what does the work
+         and fades from where it detonates rather than from where you stood. The ${max}m ceiling is
+         a rough category figure.`;
+}
+
+/* ---------------- wiring ---------------- */
+const $ = id => document.getElementById(id);
+const wSel=$("weapon"), eSel=$("enemy"), pSel=$("part"), magIn=$("mag"), filt=$("filter");
+const pelIn=$("pel"), pelField=$("pelField"), pelVal=$("pelVal"), pelMax=$("pelMax"), pelHint=$("pelHint");
+const fragIn=$("frag"), fragField=$("fragField"), fragVal=$("fragVal"), fragMax=$("fragMax"), fragHint=$("fragHint");
+const fireField=$("fireField"), fireSecIn=$("fireSec"), fireSecVal=$("fireSecVal"), fireStrIn=$("fireStr"), fireHint=$("fireHint");
+const rangeField=$("rangeField"), rangeIn=$("rangeIn"), rangeVal=$("rangeVal"), rangeHint=$("rangeHint");
+const AVNAME=["Unarmoured I","Unarmoured II","Light","Medium","Heavy","Tank I","Tank II","Tank III","Tank IV"];
+
+/* Beam and flame weapons are listed by damage per second or per tick, so their
+   result is a duration rather than a count of trigger pulls. Everything else
+   fires discrete shots. One place decides the wording for all of them. */
+function units(w){
+  if(w.t !== "beam") return {one:"shot", many:"shots", verbose:"shots", hit:"hits", hit1:"hit",
+                             mag:"Rounds per magazine"};
+  return w.rate === "s"
+    ? {one:"second", many:"seconds", verbose:"seconds on target", hit:"seconds", hit1:"second",
+       mag:"Seconds of fire per tank"}
+    : {one:"tick", many:"ticks", verbose:"ticks on target", hit:"ticks", hit1:"tick",
+       mag:"Ticks per tank / heatsink"};
+}
+let currentWeapon = 0;
+
+function buildWeaponList(){
+  const q = filt.value.trim().toLowerCase();
+  const groups = {};
+  WEAPONS.forEach((w,i)=>{
+    if(q && !w.n.toLowerCase().includes(q) && !w.g.toLowerCase().includes(q)) return;
+    (groups[w.g] ||= []).push([w,i]);
+  });
+  wSel.innerHTML = "";
+  let found = false;
+  for(const g in groups){
+    const og = document.createElement("optgroup"); og.label = g;
+    groups[g].forEach(([w,i])=>{
+      const o=document.createElement("option"); o.value=i; o.textContent=w.n;
+      if(i === currentWeapon){ o.selected = true; found = true; }
+      og.appendChild(o);
+    });
+    wSel.appendChild(og);
+  }
+  if(!wSel.options.length){
+    const o=document.createElement("option"); o.textContent="no match"; o.value="-1"; wSel.appendChild(o);
+  } else if(!found){
+    wSel.selectedIndex = 0;
+    currentWeapon = parseInt(wSel.value);
+    magIn.value = WEAPONS[currentWeapon].mag;
+    resetPellets();
+  }
+}
+function buildEnemyList(){
+  const groups={};
+  ENEMIES.forEach((it,i)=>{ (groups[it.f] ||= []).push([it,i]); });
+  eSel.innerHTML="";
+  for(const g in groups){
+    const og=document.createElement("optgroup"); og.label=g;
+    groups[g].forEach(([it,i])=>{
+      const o=document.createElement("option"); o.value=i; o.textContent=it.n; og.appendChild(o);
+    });
+    eSel.appendChild(og);
+  }
+}
+function fillParts(){
+  const en=ENEMIES[eSel.value];
+  pSel.innerHTML="";
+  en.parts.forEach((p,i)=>{
+    const o=document.createElement("option"); o.value=i; o.textContent=p.n; pSel.appendChild(o);
+  });
+}
+
+function render(){
+  if(wSel.value === "-1") return;
+  const w=WEAPONS[currentWeapon], en=ENEMIES[eSel.value], p=en.parts[pSel.value];
+  const sustained = w.t === "beam";
+  const U = units(w);
+  const mag = Math.max(1, parseInt(magIn.value) || w.mag);
+  const noReload = w.mag >= 9999;
+
+  /* how many pellets / fragments the player is actually landing */
+  const maxPel  = w.pel || 1;
+  const hitPel  = Math.min(maxPel, Math.max(1, parseInt(pelIn.value) || maxPel));
+  const maxFrag = w.frag ? w.frag.n : 0;
+  const rawFrag = parseInt(fragIn.value);
+  const hitFrag = maxFrag ? Math.min(maxFrag, Math.max(0, isNaN(rawFrag)?0:rawFrag)) : 0;
+
+  /* ---- engagement range ---- */
+  const ranged = !w.rng.na && w.rng.max > 0;
+  const dist = ranged ? Math.min(w.rng.max, Math.max(0, parseInt(rangeIn.value) || 0)) : 0;
+  const rMult = ranged ? falloff(w,dist) : 1;
+
+  /* ---- burning ----
+     Work out the dry result first. If the target dies at or before the shot
+     that guarantees ignition, it never catches fire and the burn is worth
+     nothing. Only when it survives past that point does the burn get counted,
+     and even then the kill can never land earlier than the igniting shot. */
+  const fps  = firePerSecond(en);
+  const ign  = shotsToIgnite(w,en,hitPel);
+  const fireSec = w.fire ? Math.max(0, parseFloat(fireSecIn.value) || 0) : 0;
+  let burn = 0, r = simulate(w,en,p,hitPel,hitFrag,0,rMult);
+  const dryPulls = r.pulls;
+  if(w.fire && ign && fireSec > 0 && fps.dps > 0 && dryPulls > ign.max && r.reason !== "blocked"){
+    burn = Math.round(fps.dps * fireSec);
+    const wet = simulate(w,en,p,hitPel,hitFrag,burn,rMult);
+    r = wet.pulls < ign.max ? Object.assign({},wet,{pulls:ign.max}) : wet;
+  }
+  const shots = r.pulls;
+  const impact = r.comps[0];
+  const blocked = r.reason === "blocked";
+  const partial = !blocked && r.comps.some(c=>c.blocked && c.n>0);
+
+  pelField.style.display = maxPel > 1 ? "" : "none";
+  pelVal.textContent = hitPel; pelMax.textContent = maxPel;
+  pelHint.textContent = maxPel > 1
+    ? `${impact.blocked?0:impact.dmg} × ${hitPel} = ${impact.blocked?0:impact.dmg*hitPel} damage per trigger pull`
+    : "";
+
+  fragField.style.display = maxFrag ? "" : "none";
+  fragIn.max = maxFrag || 1;
+  fragVal.textContent = hitFrag; fragMax.textContent = maxFrag;
+  if(maxFrag){
+    const fc = r.comps.find(c=>c.key==="frag");
+    fragHint.textContent = hitFrag === 0
+      ? "None landing — impact and blast only"
+      : (fc.blocked
+          ? `AP${fc.ap} bounces off AV${p.av} — fragments do nothing here`
+          : `${hitFrag} × ${fc.dmg} = ${hitFrag*fc.dmg} extra damage a ${U.one}`);
+  }
+
+  rangeField.style.display = ranged ? "" : "none";
+  if(ranged){
+    rangeIn.max = w.rng.max;
+    rangeVal.textContent = dist;
+    rangeHint.textContent =
+      w.rng.src === "rule" ? `No falloff — ${w.noFall} weapon` :
+      w.rng.src === "none" ? `Not in the measured set — treated as flat` :
+      `${Math.round(rMult*100)}% damage at this range` + (rMult>1 ? " (gains with distance)" : "");
+  }
+  drawRangeChart(w,p,hitPel,hitFrag,dist);
+
+  fireField.style.display = w.fire ? "" : "none";
+  if(w.fire){
+    fireSecVal.textContent = fireSec;
+    const per = w.fire.str * (maxPel>1 ? hitPel : 1);
+    if(fps.dps <= 0){
+      fireHint.textContent = `Fire is AP${FIRE.ap} and this target's body is AV${en.mainAV} — burning does nothing here.`;
+    } else if(!ign){
+      fireHint.textContent = "—";
+    } else {
+      const unit = ign.max===1 ? U.hit1 : U.hit;
+      fireHint.textContent =
+        `${ign.max} ${unit} to ignite (${ign.min} may do it) · ${fps.dps}/s` +
+        (fireSec>0 ? ` · ${Math.round(fps.dps*fireSec).toLocaleString()} total over ${fireSec}s` : "");
+    }
+  }
+
+  $("magLabel").textContent = U.mag;
+  $("weaponStats").textContent = [
+    `${impact.label.toLowerCase()} ${w.d}/${w.dur} AP${w.ap}` + (maxPel>1?` ×${maxPel}`:""),
+    w.blast ? `blast ${w.blast.d}/${w.blast.dur} AP${w.blast.ap}` : "",
+    w.frag  ? `shrapnel ${w.frag.d}/${w.frag.dur} AP${w.frag.ap} ×${w.frag.n} max` : "",
+    w.t==="beam" ? "sustained" : (w.t==="arc" ? "arc" : "")
+  ].filter(Boolean).join(" · ");
+  $("enemyStats").textContent = `${en.main.toLocaleString()} main health · AV${en.mainAV} ${AVNAME[en.mainAV]}`;
+  $("partStats").textContent = p.hp === "main"
+    ? `feeds main pool · AV${p.av} ${AVNAME[p.av]} · ${Math.round(p.dur*100)}% durable`
+    : `${p.hp.toLocaleString()} hp · AV${p.av} ${AVNAME[p.av]} · ${Math.round(p.dur*100)}% durable`;
+
+  const stkEl=$("stk"), unitEl=$("stkUnit"), killEl=$("killline"), flags=[];
+  const one   = shots === 1;
+  const noun1 = one ? U.one : U.many;
+  /* "Harvester (shield up)" reads badly mid-sentence */
+  const enName = en.n.replace(/\s*\([^)]*\)\s*$/,"");
+
+  /* "impact 172 + blast 225" style breakdown of one trigger pull */
+  const partsPhrase = r.live.map(c=>
+    `${c.label.toLowerCase()}${c.n>1?` ${c.n}×`:" "}<b>${c.dmg}</b>`).join(" + ");
+
+  if(blocked){
+    stkEl.textContent="—"; stkEl.classList.add("blocked");
+    unitEl.textContent="no effect";
+    const best=Math.max(...r.comps.filter(c=>c.n>0).map(c=>c.ap));
+    killEl.innerHTML=`Nothing on this round gets through AV${p.av} ${AVNAME[p.av]} armour — `+
+      `the best component is AP${best}. Shots ricochet.`;
+    flags.push(`<span class="flag block">Ricochet — bring AP${p.av} or higher</span>`);
+  } else if(r.reason==="stall" || shots===Infinity){
+    const broke=isFinite(shots);
+    stkEl.textContent=broke?shots:"∞"; stkEl.classList.add("blocked");
+    unitEl.textContent=broke?`${noun1} to break`:"never kills";
+    const carried = Math.round(r.toMainTotal||0);
+    killEl.innerHTML=broke
+      ? `${shots} ${noun1} ${one?"destroys":"destroy"} the ${p.n.toLowerCase()}. `+
+        (carried>0
+          ? `That carries <b>${carried.toLocaleString()}</b> into main health — of ${en.main.toLocaleString()} — and then stops. You still have to finish the ${enName} another way.`
+          : `None of that damage reaches the ${enName}. You still have to kill it afterwards.`)
+      : `This part can be destroyed but doesn't carry enough damage through to finish the target.`;
+    flags.push(`<span class="flag block">Breaks the part, not the target</span>`);
+  } else {
+    stkEl.textContent=shots; stkEl.classList.remove("blocked");
+    unitEl.textContent = sustained ? U.verbose : (one ? "shot" : "shots");
+    const how = r.reason==="burn"
+      ? `set it alight, and the burn finishes off <b>${en.main.toLocaleString()}</b> main health on its own`
+      : r.reason==="part"
+      ? `destroys the <b>${p.n.replace(/ \(of \d+\)/,"").toLowerCase()}</b>, which is fatal`
+      : `empties <b>${en.main.toLocaleString()}</b> main health`;
+    killEl.innerHTML = r.live.length>1
+      ? `${shots} × <b>${r.perPull}</b> a ${U.one} — ${partsPhrase} — ${how}.`
+      : `${shots} × <b>${r.perPull}</b> damage ${how}.`;
+
+    if(burn>0){
+      const saved = dryPulls - shots;
+      flags.push(saved>0
+        ? `<span class="flag fire">Burning for ${fireSec}s — ${burn.toLocaleString()} into main, saving ${saved} ${saved===1?U.one:U.many}</span>`
+        : `<span class="flag fire">Burning for ${fireSec}s — ${burn.toLocaleString()} into main, but this kill breaks a part, so it lands no sooner</span>`);
+    }
+    else if(w.fire && ign && fireSec>0 && fps.dps>0 && dryPulls<=ign.max)
+      flags.push(`<span class="flag fire">Dies before it catches — needs ${ign.max} ${ign.max===1?U.hit1:U.hit} to ignite</span>`);
+    if(ranged && rMult < 1)
+      flags.push(`<span class="flag armor">${Math.round(rMult*100)}% damage at ${dist}m</span>`);
+    if(maxPel>1 && hitPel<maxPel)
+      flags.push(`<span class="flag armor">${hitPel} of ${maxPel} pellets landing</span>`);
+    if(maxFrag && hitFrag>0)
+      flags.push(`<span class="flag armor">${hitFrag} of ${maxFrag} fragments landing</span>`);
+
+    if(!sustained && !noReload){
+      const reloads=Math.ceil(shots/mag)-1;
+      if(reloads>0) flags.push(`<span class="flag reload">${reloads} reload${reloads>1?"s":""} mid-kill</span>`);
+      else flags.push(`<span class="flag clean">One magazine — ${mag-shots} round${mag-shots===1?"":"s"} spare</span>`);
+      if(shots > mag*3) flags.push(`<span class="flag block">Wrong tool for the job</span>`);
+    }
+  }
+  if(partial){
+    const bounced = r.comps.filter(c=>c.blocked && c.n>0).map(c=>c.label.toLowerCase()).join(" and ");
+    flags.push(`<span class="flag armor">Partial — ${bounced} bounces off AV${p.av}</span>`);
+  }
+  const grazing = r.live.filter(c=>c.mult===0.65).map(c=>c.label.toLowerCase());
+  if(grazing.length) flags.push(`<span class="flag armor">${grazing.join(" and ")} AP matches armour — 65%</span>`);
+  if(p.requires) flags.push(`<span class="flag armor">Break ${p.requires} first</span>`);
+  if(w.blast || w.t==="explosion")
+    flags.push(`<span class="flag armor">Blast splash onto other parts not counted</span>`);
+  $("flags").innerHTML=flags.join("");
+
+  const belt=$("belt"), overflow=$("beltOverflow");
+  belt.innerHTML=""; overflow.textContent="";
+  if(!isFinite(shots) || blocked || sustained || noReload){
+    $("beltWrap").style.display="none";
+  } else {
+    $("beltWrap").style.display="";
+    $("beltLabel").textContent = r.reason==="stall" ? "Ammunition to break the part" : "Ammunition expended";
+    const LIMIT=150, draw=Math.min(shots,LIMIT);
+    for(let i=1;i<=draw;i++){
+      if(i>1 && (i-1)%mag===0){ const br=document.createElement("div"); br.className="magbreak"; belt.appendChild(br); }
+      const d=document.createElement("div"); d.className="rnd"+(i===shots?" kill":""); belt.appendChild(d);
+    }
+    const mags=Math.ceil(shots/mag);
+    let txt=`${shots} round${shots===1?"":"s"} · ${mags} magazine${mags>1?"s":""} of ${mag}`;
+    if(shots>LIMIT) txt=`Showing first ${LIMIT} of ${shots} rounds · ${mags} magazines of ${mag}`;
+    overflow.textContent = txt + (shots>mag ? " · dashed line = reload" : "");
+  }
+
+  /* one block of rows per damage instance the round produces */
+  const rows=[];
+  rows.push(["Part durability", Math.round(p.dur*100)+"%"]);
+  if(ranged) rows.push(["Range falloff", rMult===1 ? `none at ${dist}m` : `${Math.round(rMult*100)}% at ${dist}m`, rMult===1?"":"bad"]);
+  if(w.phys) rows.push(["Projectile", `cal ${w.phys.cal} · ${w.phys.mass}g · ${w.phys.v0} m/s · drag ${w.phys.drag}`]);
+  for(const c of r.comps){
+    if(c.n<=0 && c.key==="frag"){ rows.push([`${c.label}`,"none landing"]); continue; }
+    rows.push([`— ${c.label} —`, `${c.d} / ${c.dur} durable · AP${c.ap}`]);
+    if(c.blocked){
+      rows.push(["Armour check", `AP${c.ap} < AV${p.av} — bounces`, "bad"]);
+      rows.push(["Damage landed", 0, "bad"]);
+    } else {
+      rows.push(["Blended", Math.round(c.raw*10)/10]);
+      rows.push(["Armour check", c.mult===1
+        ? `AP${c.ap} > AV${p.av} — full damage` : `AP${c.ap} = AV${p.av} — 65%`]);
+      rows.push([c.n>1?`Damage landed (×${c.n})`:"Damage landed",
+        c.n>1?`${c.dmg} each · ${c.dmg*c.n}`:c.dmg, "hi"]);
+    }
+  }
+  $("dmgHead").textContent = sustained ? `Damage per ${U.one}` : "Damage per shot";
+  rows.push([sustained?`Total per ${U.one}`:"Total per trigger pull", r.perPull, blocked?"bad":"hi"]);
+  rows.push(["Carried to main", Math.round(r.perPull*p.toMain)+` (${Math.round(p.toMain*100)}%)`]);
+  if(w.fire){
+    rows.push(["— Burning —", `${FIRE.dps}/s · AP${FIRE.ap} · ignores durability`]);
+    rows.push([`Fire multiplier (${en.n.replace(/\s*\([^)]*\)\s*$/,"")})`, `×${en.fireMult ?? 1}`]);
+    if(fps.mult === 0) rows.push(["Armour check", `AP${FIRE.ap} < AV${en.mainAV} — no burn damage`,"bad"]);
+    else if(fps.mult === 0.65) rows.push(["Armour check", `AP${FIRE.ap} = AV${en.mainAV} — 65%`]);
+    rows.push(["Burn per second", fps.dps, fps.dps?"hi":"bad"]);
+    if(ign) rows.push(["Hits to ignite", `${ign.max} guaranteed · ${ign.min} minimum`]);
+    rows.push(["Burn counted", burn ? burn.toLocaleString()+` over ${fireSec}s` : "none", burn?"hi":""]);
+  }
+  $("dmgTable").innerHTML = rows.map(([a,b,c])=>`<tr class="${c||""}"><td>${a}</td><td>${b}</td></tr>`).join("");
+
+  $("mathline").innerHTML = blocked ? "" :
+    r.live.map(c=>
+      `<em>${c.label}</em> ${c.d} × (1 − ${p.dur.toFixed(2)}) + ${c.dur} × ${p.dur.toFixed(2)}
+       = ${Math.round(c.raw*10)/10}, × ${c.mult} armour = <em>${c.dmg}</em>` +
+      (c.n>1?` × ${c.n} = <em>${c.dmg*c.n}</em>`:"")
+    ).join("<br>") +
+    (r.live.length>1 ? `<br>Each instance is checked against the part separately, so one shot lands
+     <em>${r.perPull}</em> in total.` : "");
+
+  const prow=[];
+  if(p.hp==="main") prow.push(["This part's health","none — hits main directly"]);
+  else {
+    prow.push(["Part health", p.hp.toLocaleString()]);
+    if(p.con) prow.push([p.decay===0?"Constitution (no decay)":`Constitution (${p.decay}/s decay)`, p.con.toLocaleString()]);
+    if(p.con && p.decay===0) prow.push(["Effective part health",(p.hp+p.con).toLocaleString(),"hi"]);
+  }
+  prow.push(["Main health pool", en.main.toLocaleString()]);
+  prow.push(["Transfer to main", Math.round(p.toMain*100)+"%"]);
+  prow.push(["Overflow capped", p.cap?"yes":"no"]);
+  prow.push(["Destroying it kills", p.fatal?"yes":"no", p.fatal?"hi":""]);
+  $("poolTable").innerHTML = prow.map(([a,b,c])=>`<tr class="${c||""}"><td>${a}</td><td>${b}</td></tr>`).join("");
+  $("notesline").innerHTML = [w.note,p.note,en.note].filter(Boolean).map(n=>`<em>${n}</em>`).join("<br>");
+}
+
+filt.addEventListener("input", ()=>{ buildWeaponList(); render(); });
+function resetPellets(){
+  const w = WEAPONS[currentWeapon];
+  const m = w.pel || 1;
+  pelIn.max = m; pelIn.value = m;
+  /* shrapnel starts at zero: impact + blast is the figure you can rely on,
+     and fragment counts are the least trustworthy number here */
+  fragIn.max = w.frag ? w.frag.n : 1;
+  fragIn.value = 0;
+  /* Buildup per hit is the one fire number with no published source for most
+     weapons, so it is left editable and reset to this weapon's default. */
+  if(w.fire) fireStrIn.value = w.fire.str;
+  /* Engagement range starts at 10m, or the weapon's ceiling if that is nearer. */
+  if(!w.rng.na && w.rng.max > 0){
+    rangeIn.max = w.rng.max;
+    rangeIn.value = Math.min(10, w.rng.max);
+  }
+}
+wSel.addEventListener("change", ()=>{
+  currentWeapon = parseInt(wSel.value);
+  magIn.value = WEAPONS[currentWeapon].mag;
+  resetPellets();
+  render();
+});
+pelIn.addEventListener("input", render);
+fragIn.addEventListener("input", render);
+fireSecIn.addEventListener("input", render);
+rangeIn.addEventListener("input", render);
+fireStrIn.addEventListener("input", ()=>{
+  const w = WEAPONS[currentWeapon];
+  const v = parseFloat(fireStrIn.value);
+  if(w.fire && v > 0) w.fire.str = v;
+  render();
+});
+eSel.addEventListener("change", ()=>{ fillParts(); render(); });
+pSel.addEventListener("change", render);
+magIn.addEventListener("input", render);
+
+buildWeaponList(); buildEnemyList(); fillParts();
+magIn.value = WEAPONS[currentWeapon].mag;
+resetPellets();
+render();
+</script>
+</body>
+</html>
