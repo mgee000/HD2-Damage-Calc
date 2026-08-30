@@ -648,6 +648,27 @@ function falloff(w,dist){
 
 /* ===================== ENEMIES ===================== */
 const ENEMIES = [
+{n:"Scavenger",f:"Terminid",main:60,mainAV:0,fireMult:0.5,fireLo:1.5,fireHi:2.4,fireSrc:"mixed",
+ note:"The weakest Terminid in the game. Anything kills it; the point is to kill it before it screams and calls a breach.",
+ parts:[
+  {n:"Main",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:20,av:0,dur:0,toMain:1.00,fatal:true,cap:true,note:"A single melee swing to the head kills it and costs no ammunition."},
+  {n:"Limb (of 6)",hp:30,av:0,dur:0,toMain:0.30,fatal:false}]},
+
+{n:"Bile Spitter",f:"Terminid",main:60,mainAV:0,fireMult:0.5,fireLo:1.5,fireHi:2.4,fireSrc:"mixed",
+ note:"Same frame as the Scavenger, but every part is fatal and it bursts for 85 blast on death — packed groups chain-detonate off one kill.",
+ parts:[
+  {n:"Main",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:20,av:0,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Limb (of 6)",hp:30,av:0,dur:0,toMain:0.30,fatal:true,cap:true,note:"Unlike the Scavenger's, the Spitter's limbs are fatal — clipping a leg kills it."}]},
+
+{n:"Pouncer",f:"Terminid",main:60,mainAV:0,fireMult:0.5,fireLo:1.5,fireHi:2.4,fireSrc:"est",
+ note:"Scavenger statline with wings. Kill it before the other small bugs — it can leap straight into melee.",
+ parts:[
+  {n:"Main",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:20,av:0,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Limb (of 6)",hp:30,av:0,dur:0,toMain:0.30,fatal:true,cap:true,note:"Fatal, unlike the Scavenger's limbs."}]},
+
 {n:"Warrior",f:"Terminid",main:325,mainAV:1,fireMult:0.8,fireLo:2.1,fireHi:3.3,fireSrc:"wiki",
  note:"Challenging difficulty and above. On Medium and below it has 250 main, 110 head, 75 limbs.",
  parts:[
@@ -655,6 +676,22 @@ const ENEMIES = [
   {n:"Head",hp:150,av:1,dur:0.20,toMain:1.00,fatal:true,con:200,decay:70,note:"Losing the head triggers the berserk bleedout rather than an instant stop."},
   {n:"Claw (of 2)",hp:100,av:1,dur:0,toMain:0.40,fatal:false},
   {n:"Leg (of 4)",hp:100,av:1,dur:0,toMain:0.40,fatal:false}]},
+
+{n:"Bile Warrior",f:"Terminid",main:325,mainAV:1,fireMult:0.8,fireLo:2.1,fireHi:3.3,fireSrc:"est",
+ note:"Identical to the Warrior, but it bursts with bile on death — kill it from a distance. Taking the head off and letting it bleed out prevents the explosion entirely.",
+ parts:[
+  {n:"Body (main)",hp:"main",av:1,dur:0.20,toMain:1.00,fatal:true},
+  {n:"Head",hp:150,av:1,dur:0.20,toMain:1.00,fatal:true,con:200,decay:70,note:"Decapitation starts the berserk bleedout — and stops the death explosion."},
+  {n:"Claw (of 2)",hp:100,av:1,dur:0,toMain:0.40,fatal:false},
+  {n:"Leg (of 4)",hp:100,av:1,dur:0,toMain:0.40,fatal:false,note:"Losing a leg cancels the berserk speed boost."}]},
+
+{n:"Alpha Warrior",f:"Terminid",main:325,mainAV:1,fireMult:0.8,fireLo:2.1,fireHi:3.3,fireSrc:"est",
+ note:"Only spawns from Alpha Commanders, and it's faster than a Warrior. The head passes just 50% to main, so decapitation leaves a fast bleeding-out bug that can still reach you — finish it rather than walking away.",
+ parts:[
+  {n:"Body (main)",hp:"main",av:1,dur:0.20,toMain:1.00,fatal:true},
+  {n:"Head",hp:150,av:1,dur:0.20,toMain:0.50,fatal:true,con:200,decay:70},
+  {n:"Claw (of 2)",hp:100,av:1,dur:0,toMain:0.50,fatal:false},
+  {n:"Leg (of 4)",hp:100,av:1,dur:0,toMain:0.50,fatal:false,note:"Legs slow it down — worth doing given the speed."}]},
 
 {n:"Hunter",f:"Terminid",main:160,mainAV:0,fireMult:0.6,fireLo:1.5,fireHi:2.4,fireSrc:"est",
  note:"Challenging difficulty and above. On Medium and below it has 130 main and 45 on claws and legs.",
@@ -665,6 +702,55 @@ const ENEMIES = [
   {n:"Leg (of 4)",hp:60,av:0,dur:0,toMain:0.50,fatal:false,note:"Breaking legs stops it pouncing and slows it badly."},
   {n:"Wing (of 2)",hp:20,av:0,dur:0,toMain:0.30,fatal:false,note:"Shooting the wings off also prevents the pounce."}]},
 
+{n:"Predator Hunter",f:"Terminid",main:175,mainAV:0,fireMult:0.6,fireLo:1.5,fireHi:2.4,fireSrc:"est",
+ note:"Predator Strain. A Hunter with a bit more health that also cloaks like a Stalker and spits bile for far more damage than a Spitter. Everything on it is unarmoured — the difficulty is tracking it, not penetrating it.",
+ parts:[
+  {n:"Body (main)",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:40,av:0,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Claw (of 2)",hp:60,av:0,dur:0,toMain:0.40,fatal:false},
+  {n:"Leg (of 4)",hp:60,av:0,dur:0,toMain:0.50,fatal:false,note:"Breaking legs stops the pounce and slows it badly."},
+  {n:"Wing (of 2)",hp:20,av:0,dur:0,toMain:0.30,fatal:false}]},
+
+{n:"Shrieker",f:"Terminid",main:80,mainAV:0,fireMult:0.5,fireLo:1.5,fireHi:2.4,fireSrc:"est",
+ note:"80 health, no armour anywhere. The problem is hitting it, not killing it — lasers and flak solve that. Killing one mid-dive drops the corpse on you, so move after the shot.",
+ parts:[
+  {n:"Main",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:30,av:0,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Wing (of 2)",hp:20,av:0,dur:1.00,toMain:0.30,fatal:true,cap:true,note:"Only 20 health and fatal, but fully durable — durable damage is what clips a wing."},
+  {n:"Limbs",hp:30,av:0,dur:0,toMain:0.40,fatal:false}]},
+
+{n:"Hive Guard",f:"Terminid",main:500,mainAV:2,fireMult:0.8,fireLo:2.1,fireHi:3.3,fireSrc:"wiki",
+ note:"A Warrior with an AV3 head and frontal plates. It crouches whenever you shoot at it, tucking the front legs in — but there's still a gap between the legs and head that exposes the AV2 body. Fire penetrates at Heavy AP, which is why incendiaries beat it so easily.",
+ parts:[
+  {n:"Main",hp:"main",av:2,dur:0.30,toMain:1.00,fatal:true},
+  {n:"Head",hp:250,av:3,dur:0.35,toMain:0.75,fatal:true,con:200,decay:75,note:"Medium armour and 35% durable. High-DPS medium-pen guns punch through it before the Hive Guard closes."},
+  {n:"Claw (of 2)",hp:100,av:1,dur:0,toMain:0.25,fatal:false,note:"Losing both claws kills it, though neither is flagged fatal on its own."},
+  {n:"Frontal tarsal plate (of 2)",hp:125,av:3,dur:0,toMain:0.45,fatal:false,armor:true},
+  {n:"Front leg (of 2)",hp:125,av:1,dur:0,toMain:0.45,fatal:false,note:"The unarmoured section behind the plate. AV1 and 45% transfer — the best light-pen target when it isn't crouched."},
+  {n:"Rear leg (of 2)",hp:125,av:1,dur:0,toMain:0.35,fatal:false}]},
+
+{n:"Nursing Spewer",f:"Terminid",main:750,mainAV:2,fireMult:1.0,fireLo:3.0,fireHi:4.8,fireSrc:"est",
+ note:"The same frame as the Bile Spewer, but the armour stays AV2 at every difficulty, so the head is always available to light-pen weapons.",
+ parts:[
+  {n:"Main",hp:"main",av:2,dur:0.50,toMain:1.00,fatal:true},
+  {n:"Head",hp:300,av:2,dur:0,toMain:1.00,fatal:true,cap:true,note:"The weak spot. Light armour and no durability — anything kills it here."},
+  {n:"Mouth",hp:250,av:0,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Spinal plates",hp:500,av:2,dur:0.80,toMain:0.20,fatal:true,cap:true},
+  {n:"Butt",hp:750,av:0,dur:1.00,toMain:0.60,fatal:true,cap:true,note:"Fully durable but no explosion resistance — one impact grenade underneath usually finishes it."},
+  {n:"Front leg (of 2)",hp:200,av:2,dur:0,toMain:0.50,fatal:false},
+  {n:"Rear leg (of 2)",hp:250,av:2,dur:0.30,toMain:0.50,fatal:false}]},
+
+{n:"Bile Spewer",f:"Terminid",main:750,mainAV:2,fireMult:1.0,fireLo:3.0,fireHi:4.8,fireSrc:"est",
+ note:"Values shown are for Extreme and below. From Extreme upward the main body, head, spinal plates and front legs all go from AV2 to AV3, so light-pen weapons lose the head shot and have to use the mouth.\n\nThe butt has no explosion resistance at all despite being 100% durable — explosive and plasma weapons gut it.",
+ parts:[
+  {n:"Main",hp:"main",av:2,dur:0.50,toMain:1.00,fatal:true},
+  {n:"Head",hp:300,av:2,dur:0,toMain:1.00,fatal:true,cap:true,note:"The weak spot: 300 health, no durability, 100% transfer. Needs medium pen on Extreme and above."},
+  {n:"Mouth",hp:250,av:0,dur:0,toMain:1.00,fatal:true,cap:true,note:"Unarmoured at every difficulty — the light-pen answer when the head plates harden."},
+  {n:"Spinal plates",hp:500,av:2,dur:0.80,toMain:0.20,fatal:true,cap:true,note:"Fatal and takes full explosion damage."},
+  {n:"Butt",hp:750,av:0,dur:1.00,toMain:0.60,fatal:true,cap:true,note:"Unarmoured, fatal, fully durable, zero explosion resistance. Ballistics crawl here; explosives and plasma pop it."},
+  {n:"Front leg (of 2)",hp:200,av:2,dur:0,toMain:0.50,fatal:false},
+  {n:"Rear leg (of 2)",hp:250,av:2,dur:0.30,toMain:0.50,fatal:false}]},
+
 {n:"Brood Commander",f:"Terminid",main:800,mainAV:2,fireMult:1.0,fireLo:3.0,fireHi:4.8,fireSrc:"mixed",
  note:"Lightly armoured but 60% durable on the body, so it soaks far more small-arms fire than its armour class suggests.",
  parts:[
@@ -672,6 +758,37 @@ const ENEMIES = [
   {n:"Head",hp:200,av:2,dur:0.60,toMain:0.50,fatal:true,con:300,decay:75,note:"Decapitation starts a berserk bleedout it can survive long enough to reach you — often not worth it."},
   {n:"Claw (of 2)",hp:200,av:2,dur:0.50,toMain:0.50,fatal:false},
   {n:"Leg (of 4)",hp:170,av:1,dur:0.40,toMain:0.60,fatal:false,note:"The only unarmoured part. Each leg lost slows it further, including its charge."}]},
+
+{n:"Alpha Commander",f:"Terminid",main:1000,mainAV:2,fireMult:1.0,fireLo:3.0,fireHi:4.8,fireSrc:"est",
+ note:"A heavier Brood Commander that summons Alpha Warriors and Hive Guards — and it keeps doing so after decapitation, so taking the head off doesn't stop the reinforcements.",
+ parts:[
+  {n:"Main",hp:"main",av:2,dur:0.70,toMain:1.00,fatal:true},
+  {n:"Head",hp:250,av:2,dur:0.70,toMain:1.00,fatal:true,con:300,decay:100,note:"70% durable with a 300 constitution bleed — medium pen and explosives clear it far faster than light-pen fire."},
+  {n:"Claw (of 2)",hp:200,av:2,dur:0.50,toMain:0.50,fatal:false,note:"Destroying both claws kills it."},
+  {n:"Leg (of 4)",hp:200,av:1,dur:0.50,toMain:0.60,fatal:false,note:"Unarmoured, so light-pen weapons work here. Each leg lost slows it, though it can still charge."}]},
+
+{n:"Stalker",f:"Terminid",main:800,mainAV:1,fireMult:1.25,fireLo:3.0,fireHi:4.8,fireSrc:"mixed",
+ note:"Unarmoured but 50% durable almost everywhere, so it soaks like a Brood Commander. Below half health it cloaks and regenerates about 50/s — fire both counteracts the regen and reveals it, and it takes 25% extra fire damage.",
+ parts:[
+  {n:"Main",hp:"main",av:1,dur:0.50,toMain:1.00,fatal:true},
+  {n:"Head",hp:175,av:1,dur:0,toMain:1.00,fatal:true,cap:true,note:"Only 175 health at AV1 with no durability — the one part that isn't a slog. Precision beats volume here."},
+  {n:"Underbelly",hp:"main",av:1,dur:0.50,toMain:1.00,fatal:true,cap:true},
+  {n:"Body armour",hp:"main",av:2,dur:0.50,toMain:1.00,fatal:false,cap:true},
+  {n:"Claw (of 2)",hp:"main",av:1,dur:0.50,toMain:1.00,fatal:false,cap:true},
+  {n:"Leg (of 4)",hp:"main",av:1,dur:0.50,toMain:1.00,fatal:false,cap:true},
+  {n:"Wings",hp:125,av:0,dur:0.50,toMain:0.30,fatal:false,cap:true}]},
+
+{n:"Predator Stalker",f:"Terminid",main:650,mainAV:1,fireMult:1.25,fireLo:3.0,fireHi:4.8,fireSrc:"mixed",
+ note:"Predator Strain. Weaker than a true Stalker — less health, no cloak and no tongue knockback — but far more common and relentlessly aggressive with its claws. Still takes 25% extra fire damage.",
+ parts:[
+  {n:"Main",hp:"main",av:1,dur:0.50,toMain:1.00,fatal:true},
+  {n:"Head",hp:175,av:1,dur:0,toMain:1.00,fatal:true,cap:true,note:"No durability at all — the quickest kill by a wide margin."},
+  {n:"Underbelly",hp:"main",av:1,dur:0.50,toMain:1.00,fatal:true,cap:true},
+  {n:"Body armour",hp:"main",av:2,dur:0.50,toMain:1.00,fatal:false,cap:true},
+  {n:"Left leg (of 2)",hp:200,av:1,dur:0.50,toMain:1.00,fatal:false,cap:true},
+  {n:"Right leg (of 2)",hp:200,av:1,dur:0.50,toMain:0.70,fatal:false},
+  {n:"Claw (of 2)",hp:200,av:1,dur:0.50,toMain:0.70,fatal:false},
+  {n:"Wings",hp:125,av:0,dur:0.50,toMain:0.30,fatal:false,cap:true}]},
 
 {n:"Charger",f:"Terminid",main:2400,mainAV:4,fireMult:1.5,fireLo:5,fireHi:8,fireSrc:"mixed",
  note:"Main health carries 750 constitution bleeding at 100/s, so emptying main downs it and it bleeds out.",
@@ -686,6 +803,37 @@ const ENEMIES = [
   {n:"Rear leg armour (of 2)",hp:800,av:4,dur:0.70,toMain:0.50,fatal:false,armor:true},
   {n:"Leg flesh (of 4)",hp:800,av:2,dur:0.70,toMain:0.50,fatal:true,requires:"that leg's armour"},
   {n:"Claw (of 2)",hp:500,av:4,dur:0.70,toMain:0.70,fatal:false}]},
+
+{n:"Charger Behemoth",f:"Terminid",main:3000,mainAV:4,fireMult:1.5,fireLo:5,fireHi:8,fireSrc:"est",
+ note:"A Charger with more health, more durability and angled armour. Main carries 1,000 constitution bleeding at 100/s. Same anti-tank breakpoints as the Charger: a Spear or Recoilless into the torso ends it, anything else wants the head.",
+ parts:[
+  {n:"Main",hp:"main",av:4,dur:1.00,toMain:1.00,fatal:true,cap:true,con:1000,decay:100},
+  {n:"Head",hp:1600,av:4,dur:1.00,toMain:0.70,fatal:true,note:"Fully durable at AV4 — anti-tank only, but a headshot is the guaranteed kill."},
+  {n:"Torso armour (of 2)",hp:1000,av:4,dur:0.85,toMain:1.00,fatal:false,armor:true},
+  {n:"Inner flesh",hp:"main",av:1,dur:0.30,toMain:3.00,fatal:true,cap:true,requires:"torso armour",note:"300% transfer at AV1 — the same exposed-torso bonus the Charger has. By far the fastest kill once the plate is off."},
+  {n:"Underside",hp:"main",av:2,dur:1.00,toMain:1.00,fatal:true,cap:true},
+  {n:"Rear armour plates",hp:2200,av:4,dur:0.75,toMain:0.75,fatal:true},
+  {n:"Butt",hp:950,av:0,dur:1.00,toMain:0.50,fatal:true,note:"Unarmoured but 100% durable, so only durable damage counts. Destroying it downs the Behemoth."},
+  {n:"Claw (of 2)",hp:500,av:4,dur:0.70,toMain:0.70,fatal:false},
+  {n:"Front leg armour (of 2)",hp:1000,av:4,dur:0.80,toMain:0.60,fatal:false,armor:true},
+  {n:"Rear leg armour (of 2)",hp:1000,av:4,dur:0.80,toMain:0.50,fatal:false,armor:true},
+  {n:"Leg flesh (of 4)",hp:800,av:2,dur:0.70,toMain:0.50,fatal:true,requires:"that leg's armour",note:"AV2 and fatal once stripped — machine guns finish it from here."}]},
+
+{n:"Spore Charger",f:"Terminid",main:2400,mainAV:4,fireMult:1.5,fireLo:5,fireHi:8,fireSrc:"est",
+ note:"Charger health with a spore cloud and a death explosion — stand well back, or bleed it out instead, since it won't detonate if it bleeds.\n\nThe six spore flesh sacs are extra unarmoured hitboxes but only pass 20% to main, so they're not the fast route.",
+ parts:[
+  {n:"Main",hp:"main",av:4,dur:1.00,toMain:1.00,fatal:true,cap:true,con:750,decay:100},
+  {n:"Head",hp:1200,av:4,dur:0.75,toMain:0.70,fatal:true},
+  {n:"Torso armour (of 2)",hp:800,av:4,dur:0.85,toMain:1.00,fatal:false,armor:true},
+  {n:"Inner flesh",hp:"main",av:1,dur:1.00,toMain:3.00,fatal:true,cap:true,requires:"torso armour",note:"300% transfer, but fully durable here unlike the standard Charger — durable damage still rules."},
+  {n:"Underside",hp:"main",av:2,dur:1.00,toMain:1.00,fatal:true,cap:true},
+  {n:"Rear armour plates",hp:2200,av:4,dur:0.75,toMain:0.75,fatal:true},
+  {n:"Butt",hp:950,av:0,dur:1.00,toMain:1.50,fatal:false,note:"150% transfer at AV0 — the best unarmoured angle, though it isn't fatal on its own."},
+  {n:"Spore flesh (of 6)",hp:500,av:1,dur:1.00,toMain:0.20,fatal:false,cap:true},
+  {n:"Claw (of 2)",hp:500,av:4,dur:0.70,toMain:0.70,fatal:false},
+  {n:"Front leg armour (of 2)",hp:800,av:4,dur:0.70,toMain:0.60,fatal:false,armor:true},
+  {n:"Rear leg armour (of 2)",hp:800,av:4,dur:0.70,toMain:0.50,fatal:false,armor:true},
+  {n:"Leg flesh (of 4)",hp:800,av:2,dur:0.70,toMain:0.50,fatal:true,requires:"that leg's armour"}]},
 
 {n:"Impaler",f:"Terminid",main:4000,mainAV:4,fireMult:1.7,fireLo:5,fireHi:8,fireSrc:"mixed",
  note:"The head is only exposed while the tentacles are burrowed. That window is the whole fight — AV1 and 150% transfer to main.",
@@ -726,6 +874,53 @@ const ENEMIES = [
   {n:"Leg (of 2)",hp:90,av:0,dur:0,toMain:0.65,fatal:true,cap:true},
   {n:"Arm (of 2)",hp:65,av:0,dur:0,toMain:0.50,fatal:false,note:"Blowing off the gun arm forces it into melee."}]},
 
+{n:"Commissar",f:"Automaton",main:125,mainAV:1,fireMult:0.8,fireLo:3,fireHi:5,fireSrc:"est",
+ note:"The Trooper statline at AV1 instead of AV0. It hangs back and uses the pistol rather than closing with the blade. It has no special bot-drop chance — every light Automaton has the same hidden flare launcher in its left arm.",
+ parts:[
+  {n:"Main",hp:"main",av:1,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:40,av:1,dur:0,toMain:1.00,fatal:true,cap:true,note:"Headshots and grenades reliably one-shot every light Automaton."},
+  {n:"Torso",hp:100,av:1,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Leg (of 2)",hp:90,av:1,dur:0,toMain:0.65,fatal:true,cap:true},
+  {n:"Arm (of 2)",hp:65,av:1,dur:0,toMain:0.50,fatal:false,note:"The left arm holds the flare launcher — taking it off stops the drop."}]},
+
+{n:"Brawler",f:"Automaton",main:125,mainAV:0,fireMult:0.8,fireLo:3,fireHi:5,fireSrc:"est",
+ note:"Dual heat blades, and its swings injure limbs — several Brawlers at once can keep you from stimming. Its head draws on the main pool rather than having its own, so headshots don't shortcut the kill the way they do on a Trooper.",
+ parts:[
+  {n:"Main",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:"main",av:0,dur:0,toMain:1.00,fatal:true,cap:true,note:"No separate health pool — you're chewing through all 125 main either way."},
+  {n:"Torso",hp:100,av:0,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Left arm",hp:85,av:0,dur:0,toMain:1.00,fatal:true,cap:true,note:"Fatal, and it's the arm holding the flare launcher."},
+  {n:"Leg (of 2)",hp:90,av:0,dur:0,toMain:0.65,fatal:true,cap:true},
+  {n:"Right arm",hp:65,av:0,dur:0,toMain:0.50,fatal:false}]},
+
+{n:"Rocket Raider",f:"Automaton",main:125,mainAV:0,fireMult:0.8,fireLo:3,fireHi:5,fireSrc:"est",
+ note:"Standard light-bot statline with a portable launcher. It fires from range and reloads slowly, so suppressing fire wrecks its accuracy — the danger is the ragdoll leaving you open to everything else.",
+ parts:[
+  {n:"Main",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:40,av:0,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Torso",hp:100,av:0,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Leg (of 2)",hp:90,av:0,dur:0,toMain:0.65,fatal:true,cap:true},
+  {n:"Arm (of 2)",hp:65,av:0,dur:0,toMain:0.50,fatal:false,note:"Left arm holds the flare launcher."}]},
+
+{n:"Marauder",f:"Automaton",main:125,mainAV:0,fireMult:0.8,fireLo:3,fireHi:5,fireSrc:"est",
+ note:"A Trooper with AV2 torso armour — the only difference. Head and limbs are still unarmoured, so nothing changes if you aim high.",
+ parts:[
+  {n:"Main",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:40,av:0,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Torso",hp:100,av:2,dur:0,toMain:1.00,fatal:true,cap:true,note:"Light armour here, unlike the Trooper's bare AV0 chest."},
+  {n:"Leg (of 2)",hp:90,av:0,dur:0,toMain:0.65,fatal:true,cap:true},
+  {n:"Arm (of 2)",hp:65,av:0,dur:0,toMain:0.50,fatal:false}]},
+
+{n:"MG Raider",f:"Automaton",main:125,mainAV:0,fireMult:0.8,fireLo:3,fireHi:5,fireSrc:"est",
+ note:"Recognisable by the two heat-sink fins on its powerpack. The Light Fusion Repeater fires nearly continuously and can shred you in one burst, so suppress it even with inaccurate fire.\n\nThe powerpack is a 50hp AV2 target with 1,000 constitution decaying at 200/s — shooting it detonates the pack.",
+ parts:[
+  {n:"Main",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:40,av:0,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Torso",hp:100,av:0,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Leg (of 2)",hp:90,av:0,dur:0,toMain:0.65,fatal:true,cap:true},
+  {n:"Backpack",hp:50,av:2,dur:0,toMain:1.00,fatal:true,cap:true,con:1000,decay:200,note:"Fatal, and it explodes. The constitution decays fast, so sustained fire beats a single tap."},
+  {n:"Arm (of 2)",hp:65,av:0,dur:0,toMain:0.50,fatal:false}]},
+
 {n:"Berserker",f:"Automaton",main:750,mainAV:0,fireMult:1.0,fireLo:4,fireHi:6.5,fireSrc:"est",
  note:"Every part is explosion-immune, so blast weapons only ever chip the main pool. The chest is the one durable part — avoid it with light-pen weapons.",
  parts:[
@@ -763,6 +958,29 @@ const ENEMIES = [
   {n:"Shoulder (of 2)",hp:150,av:2,dur:0,toMain:0.25,fatal:false},
   {n:"Shield",hp:800,av:4,dur:0.70,toMain:0,fatal:false,armor:true,note:"AV4 and 70% durable. Destroying it makes the bot drop it, but nothing transfers through."}]},
 
+{n:"Scout Strider",f:"Automaton",main:500,mainAV:4,fireMult:1.0,fireLo:4,fireHi:6.5,fireSrc:"mixed",
+ note:"The walker and its Trooper pilot are separate entities and count as separate kills, but killing the pilot destroys the walker. From Super Helldive it is replaced by the fully armoured Reinforced Scout Strider.",
+ parts:[
+  {n:"Main",hp:"main",av:4,dur:0,toMain:1.00,fatal:true},
+  {n:"Pilot",hp:125,av:0,dur:0,toMain:0,fatal:true,note:"Unarmoured and only 125 health — but you have to get around the faceplate. A dive to the flank or a grenade behind the walker both work."},
+  {n:"Waist",hp:300,av:3,dur:0,toMain:1.00,fatal:true,cap:true,note:"AV3, no durability, fatal. Two Senator rounds do it; any medium-pen primary works."},
+  {n:"Turret system",hp:300,av:3,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Leg (of 2)",hp:400,av:2,dur:0.75,toMain:0.50,fatal:true,cap:true,note:"Only AV2, so light-pen weapons can kill it here — but 75% durable, so it takes a lot of rounds."},
+  {n:"Front plate",hp:350,av:4,dur:0.40,toMain:0,fatal:true,armor:true,note:"AV4 and 40% durable. Heavy-pen or explosives only; killing it kills the walker."},
+  {n:"HMG",hp:300,av:4,dur:1.00,toMain:0,fatal:true,note:"Fully durable at AV4 — the worst place to aim despite being fatal."}]},
+
+{n:"Reinforced Scout Strider",f:"Automaton",main:500,mainAV:4,fireMult:1.0,fireLo:4,fireHi:6.5,fireSrc:"est",
+ note:"The pilot is sealed in, so the usual flanking answer is gone. Instead the four rockets are the weak point: AV2, 100 health each, 0% durable, and detonating one is meant to destroy the walker (the wiki notes this is currently bugged — it badly weakens the legs instead).\n\nReplaces the standard Scout Strider from Super Helldive.",
+ parts:[
+  {n:"Main",hp:"main",av:4,dur:0,toMain:1.00,fatal:true},
+  {n:"Rocket (of 4)",hp:100,av:2,dur:0,toMain:0,fatal:true,note:"Lowest health of any critical part and zero durability — the primary target for almost every weapon."},
+  {n:"Waist",hp:300,av:3,dur:0,toMain:1.00,fatal:true,cap:true,note:"Big, no durability, fatal. The Counter Sniper or Adjudicator answer if the rockets are too small to hit."},
+  {n:"Turret system",hp:300,av:3,dur:0,toMain:1.00,fatal:true,cap:true},
+  {n:"Leg (of 2)",hp:400,av:2,dur:0.75,toMain:0.50,fatal:true,cap:true,note:"Still the light-pen route once the rockets are spent — more health than the waist and 75% durable."},
+  {n:"Rocket rail (of 2)",hp:200,av:2,dur:0,toMain:0,fatal:false},
+  {n:"Faceplate",hp:400,av:4,dur:0.40,toMain:0,fatal:true,armor:true},
+  {n:"HMG",hp:300,av:4,dur:1.00,toMain:0,fatal:true}]},
+
 {n:"Hulk Obliterator",f:"Automaton",main:1800,mainAV:4,fireMult:1.5,fireLo:9,fireHi:14,fireSrc:"mixed",
  note:"Bruiser, Scorcher and Firebomber Hulks share this chassis.",
  parts:[
@@ -771,6 +989,30 @@ const ENEMIES = [
   {n:"Heatsink (back)",hp:900,av:1,dur:0.60,toMain:0.60,fatal:true,cap:true,con:650,decay:50,note:"The only unarmoured spot on the chassis. Destroying it starts a bleedout."},
   {n:"Leg (of 2)",hp:500,av:4,dur:0.80,toMain:0.80,fatal:false,con:500,decay:0,note:"Zero-decay constitution gives each leg 1,000 effective health. Both legs down kills it."},
   {n:"Arm (of 2)",hp:500,av:4,dur:0.70,toMain:0.80,fatal:false}]},
+
+{n:"War Strider",f:"Automaton",main:3500,mainAV:4,fireMult:1.5,fireLo:9,fireHi:14,fireSrc:"est",
+ note:"Everything is AV4 except the AV3 hip joints and the AV5 greaves, so Heavy penetration hurts it anywhere. Its grenades pass straight through shield relays and backpacks — cover and an exit route, not a bubble.",
+ parts:[
+  {n:"Main",hp:"main",av:4,dur:1.00,toMain:1.00,fatal:true},
+  {n:"Eye (of 2)",hp:500,av:4,dur:0.70,toMain:0.30,fatal:true,cap:true,note:"Lowest-health fatal part. One unsafe Railgun shot or three AMR rounds takes an eye and the Strider with it."},
+  {n:"Heatsink (rear vent)",hp:700,av:4,dur:0.70,toMain:0.70,fatal:true,cap:true,note:"The other weak spot — same idea as the eyes, from behind."},
+  {n:"Hip joint (of 2)",hp:750,av:3,dur:0.80,toMain:0.50,fatal:true,cap:true,note:"Only AV3 and fatal — an MG-43 can bring it down here."},
+  {n:"Crotch",hp:1800,av:4,dur:1.00,toMain:1.00,fatal:true,cap:true,note:"Big anti-tank target. One EAT, Quasar or Recoilless hit kills; a Thermite stuck here does too."},
+  {n:"Leg (of 2)",hp:1500,av:4,dur:0.80,toMain:0.80,fatal:true,cap:true},
+  {n:"Torso",hp:3300,av:4,dur:1.00,toMain:0.80,fatal:true,cap:true},
+  {n:"Fusion cannon (of 2)",hp:500,av:4,dur:0.80,toMain:0,fatal:false,note:"Destroying one bursts the barrel — 130 blast and a burn, so don't be underneath."},
+  {n:"Grenade launcher (of 2)",hp:400,av:4,dur:0.70,toMain:0,fatal:false,cap:true},
+  {n:"Greave (of 2)",hp:150,av:5,dur:0,toMain:0.50,fatal:false,cap:true,armor:true,note:"The one AV5 spot — rear of the legs. Anti-Tank I only."}]},
+
+{n:"Annihilator Tank",f:"Automaton",main:4000,mainAV:5,fireMult:1.5,fireLo:9,fireHi:14,fireSrc:"est",
+ note:"The Tank runs two separate health pools: a 4,000 hull (modelled here as main) and a 2,100 turret. Turret hits drain the turret pool, not the hull.\n\nEverything is AV5 except the heatsink, engine bay and tracks, so approach from behind. Shredder and Barrager Tanks share this chassis and differ only in armament.",
+ parts:[
+  {n:"Hull front",hp:"main",av:5,dur:1.00,toMain:1.00,fatal:true,note:"One Spear, Recoilless or Ultimatum into the hull ends it. So does a single Thermite."},
+  {n:"Hull side (of 2)",hp:"main",av:5,dur:1.00,toMain:1.00,fatal:true},
+  {n:"Turret heatsink",hp:750,av:3,dur:1.00,toMain:2.00,fatal:true,cap:true,note:"AV3 and 200% transfer — the vent is the medium-pen answer. AMR, Autocannon or Eruptor from behind while the turret traverses."},
+  {n:"Engine bay",hp:1500,av:4,dur:1.00,toMain:1.50,fatal:true,note:"Rear chassis at AV4 with 150% transfer."},
+  {n:"Turret (front / main)",hp:2100,av:5,dur:1.00,toMain:0,fatal:true,note:"Its own 2,100 pool. Nothing here touches the hull, but emptying it still kills the Tank."},
+  {n:"Track (of 2)",hp:750,av:3,dur:0.80,toMain:1.00,fatal:false,note:"Medium pen immobilises it without killing it."}]},
 
 {n:"Gunship",f:"Automaton",main:950,mainAV:3,fireMult:1.0,fireLo:5,fireHi:8,fireSrc:"est",
  note:"Destroying any single component brings the whole Gunship down, so concentrate fire on one part rather than spreading it.",
@@ -825,6 +1067,43 @@ const ENEMIES = [
   {n:"Limb armour (of 8)",hp:100,av:2,dur:0,toMain:0.20,fatal:false,armor:true},
   {n:"Energy shield",hp:1500,av:2,dur:0,toMain:0,fatal:false,armor:true,note:"Passes nothing through to the Overseer itself."}]},
 
+{n:"Elevated Overseer",f:"Illuminate",main:450,mainAV:0,fireMult:1.0,fireLo:3.5,fireHi:5.5,fireSrc:"est",
+ note:"Flying, and it holds about 10m off you while strafing, so it's hard to hit. Stun it and the headshot is free — it also drops the grenade it was about to throw.\n\nA destroyed jetpack detonates for 150 blast and kills it outright. Corpses with intact jetpacks stay detonatable.",
+ parts:[
+  {n:"Main",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:200,av:2,dur:0,toMain:1.00,fatal:true,cap:true,note:"A Senator or AMR round ends it instantly once it stops moving."},
+  {n:"Jetpack",hp:300,av:2,dur:0,toMain:0.50,fatal:true,cap:true,note:"Fatal — and it explodes, so don't be standing under it."},
+  {n:"Torso (armour off)",hp:600,av:1,dur:0,toMain:1.00,fatal:true,cap:true,requires:"chest armour"},
+  {n:"Right arm",hp:300,av:1,dur:0,toMain:0.50,fatal:true,cap:true},
+  {n:"Left arm",hp:300,av:1,dur:0,toMain:0.50,fatal:false,cap:true},
+  {n:"Leg (of 2)",hp:"main",av:0,dur:0,toMain:0.70,fatal:false,cap:true},
+  {n:"Chest armour",hp:150,av:2,dur:0,toMain:0.20,fatal:false,armor:true,note:"A Guard Dog strips the plating for you while you shoot elsewhere."},
+  {n:"Crotch armour",hp:200,av:2,dur:0,toMain:0.20,fatal:false,armor:true},
+  {n:"Limb armour",hp:100,av:2,dur:0,toMain:0.20,fatal:false,armor:true}]},
+
+{n:"Crescent Overseer",f:"Illuminate",main:600,mainAV:0,fireMult:1.0,fireLo:3.5,fireHi:5.5,fireSrc:"est",
+ note:"Same body and armour as a standard Overseer, used as artillery. It often never leaves the spot it spawned in, so groups of them can be cleared at once with explosives.\n\nThe backpack is not a weak point — it's intangible and can't be damaged at all.",
+ parts:[
+  {n:"Main",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Head",hp:150,av:3,dur:0,toMain:1.00,fatal:true,cap:true,note:"Medium-armoured helmet over the softest part of the body."},
+  {n:"Torso (armour off)",hp:600,av:1,dur:0,toMain:1.00,fatal:true,cap:true,requires:"chest armour"},
+  {n:"Right arm",hp:300,av:1,dur:0,toMain:0.50,fatal:true,cap:true},
+  {n:"Left arm",hp:300,av:1,dur:0,toMain:0.50,fatal:false,cap:true},
+  {n:"Leg (of 2)",hp:"main",av:0,dur:0,toMain:0.70,fatal:false,cap:true},
+  {n:"Chest armour",hp:150,av:2,dur:0,toMain:0.20,fatal:false,armor:true},
+  {n:"Crotch armour",hp:200,av:2,dur:0,toMain:0.20,fatal:false,armor:true},
+  {n:"Limb armour",hp:100,av:2,dur:0,toMain:0.20,fatal:false,armor:true}]},
+
+{n:"Watcher",f:"Illuminate",main:600,mainAV:0,fireMult:1.0,fireLo:3.0,fireHi:5.0,fireSrc:"est",
+ note:"The only Illuminate unit that calls reinforcements, so it dies first. The blue flares are cosmetic — the signal has already gone out by then. It can lose several fins and keep flying, so aim centre mass.\n\nIts corpse detonates for 80 blast when it hits the ground at speed.",
+ parts:[
+  {n:"Main",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
+  {n:"Body",hp:400,av:2,dur:0,toMain:1.00,fatal:true,cap:true,note:"Centre mass and fatal. An AMR or Railgun takes it out in one."},
+  {n:"Eye",hp:300,av:0,dur:0,toMain:1.00,fatal:false,cap:true},
+  {n:"Upper fin",hp:200,av:0,dur:0,toMain:1.00,fatal:false,cap:true},
+  {n:"Lower fin",hp:200,av:0,dur:0,toMain:1.00,fatal:false,cap:true},
+  {n:"Side fin (of 2)",hp:150,av:2,dur:0,toMain:1.00,fatal:false,cap:true}]},
+
 {n:"Voteless (light)",f:"Illuminate",main:100,mainAV:0,fireMult:0.6,fireLo:1.5,fireHi:2.4,fireSrc:"est",
  parts:[
   {n:"Body (main)",hp:"main",av:0,dur:0,toMain:1.00,fatal:true},
@@ -848,6 +1127,21 @@ const ENEMIES = [
   {n:"Legs",hp:80,av:0,dur:0,toMain:0.30,fatal:true,cap:true},
   {n:"Upper arm (of 2)",hp:80,av:0,dur:0,toMain:0.40,fatal:false,cap:true,con:1000,decay:40},
   {n:"Forearm (of 2)",hp:65,av:0,dur:0,toMain:0.30,fatal:false}]},
+
+{n:"Fleshmob",f:"Illuminate",main:5000,mainAV:0,fireMult:1.8,fireLo:4,fireHi:6.5,fireSrc:"mixed",
+ note:"No fatal parts at all — 5,000 main and pure DPS. Unarmoured everywhere and huge, so high rate-of-fire weapons and explosives both work, and it takes 1.8x fire damage.\n\nHead chunks pass 150% to main and overkill carries through, so one big alpha strike into a head can effectively one-shot it.",
+ parts:[
+  {n:"Main",hp:"main",av:0,dur:0.40,toMain:1.00,fatal:true},
+  {n:"Head chunk (of 6)",hp:400,av:0,dur:0.25,toMain:1.50,fatal:false,note:"Only 25% durable and 150% transfer with overkill carry — the best target on the body by a wide margin."},
+  {n:"Stomach chunk (of 2)",hp:400,av:0,dur:0.40,toMain:1.00,fatal:false},
+  {n:"Leg (of 2)",hp:400,av:0,dur:0.40,toMain:1.00,fatal:false,note:"Breaking legs doesn't slow it or stop its charge."},
+  {n:"Arm (of 4)",hp:200,av:0,dur:0.40,toMain:0.25,fatal:false,cap:true,note:"Breaking the arms disables the swing, leaving it only the charge."}]},
+
+{n:"Stingray",f:"Illuminate",main:800,mainAV:3,fireMult:1.0,fireLo:5,fireHi:8,fireSrc:"est",
+ note:"Only two hitboxes, both AV3. It's untouchable at speed — wait for the strafing run, when it slows enough to hit. The Laser Cannon is the exception: hitscan at 1,000m range kills it mid-flight.\n\nIt dies loudly: 300 blast on death plus the crash.",
+ parts:[
+  {n:"Main",hp:"main",av:3,dur:0.70,toMain:1.00,fatal:true,note:"70% durable at AV3 — Autocannon, AMR and Commando all excel; MG-43 and Maxigun work well too."},
+  {n:"Gun ports",hp:"main",av:3,dur:0.50,toMain:1.00,fatal:false,cap:true,note:"Only 50% durable, so this is the softer of the two hitboxes."}]},
 
 {n:"Harvester (shield up)",f:"Illuminate",main:3000,mainAV:4,fireMult:1.5,fireLo:8,fireHi:13,fireSrc:"est",
  note:"Every exterior part is explosion-immune until the carapace breaks, so pure-blast weapons below Heavy AP do nothing.",
