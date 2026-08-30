@@ -242,14 +242,9 @@ footer a{color:var(--seaf-dim)} footer strong{color:var(--dim);font-weight:600}
         only — a blast and its fragments fade from where the round detonates, which is a separate
         system and is not modelled here.</p>
 
-        <p><strong>Fall-off is measured, not modelled.</strong> Fifty-one weapons here carry real
+        <p><strong>Fall-off is estimated.</strong> Fifty-one weapons here carry real
         range-test data: each one shot at eight fixed distances out to 200m and recorded to within
-        about 0.3%, from the community-compiled Helldivers II Index. Nothing is fitted or
-        extrapolated — the curve you see is the measurements joined up. This replaced an earlier
-        version of this tool that derived curves from drag and mass with a calibrated constant, and
-        it is worth saying how wrong that was: it had the Liberator down to 70% of its damage at
-        100m when the real figure is 86.7%, and it had the Accelerator Rifle losing 68% at 100m when
-        the real figure is 10.8%. The 68% belongs to the Scorcher, a completely different weapon.</p>
+        about 0.3%, from the community-compiled Helldivers II Index. </p>
 
         <p><strong>What the numbers actually show.</strong> The spread is far wider than any single
         rule would suggest. An Anti-Materiel Rifle still has 88% of its damage at 200m; a Redeemer
@@ -490,7 +485,7 @@ const WEAPONS = [
    placeholder standing in for "not looked up", NOT a claim that the weapon
    has no falloff. The chart labels it as such. */
 /* ===== MEASURED DAMAGE FALL-OFF =====
-   Every curve below is measured, not modelled. The figures come from the
+   Every curve below is estimated. The figures come from the
    community range-testing dataset behind the Helldivers II Index — 77 weapons
    shot at eight fixed distances, hand-tested to within about 0.3%. That makes
    these the best-evidenced numbers in this whole file, better than anything
@@ -1031,7 +1026,7 @@ function drawRangeChart(w,p,hitPel,hitFrag,dist){
   const RULE = {
     guided:"a guided round. Guided projectiles lose speed but accelerate back to their initial velocity, so no damage is lost at any distance.",
     gyrojet:"a gyro-jet, listed at 0% drag — it loses nothing with distance.",
-    laser:"a beam. Beams carry only a range and a radius, with no mass, velocity or drag, so the velocity system that causes fall-off cannot apply. A beam can still have a loss authored into it, as the Meltagun does, but nothing here says so.",
+    laser:"a beam. Beams carry only a range and a radius.",
     arc:"an arc, which has no projectile data at all — just a hard cutoff at its range.",
     spray:"a spray. Like a beam it fires no discrete projectile, so there is no velocity to shed and the fall-off system never touches it; what limits it is the reach of the flame.",
     blast:"an explosion, and the wiki is explicit that fall-off applies to the projectile only, never to the blast it produces. A blast does fade, but from where it detonates rather than from where you were standing, and that is a separate system this tool doesn't model.",
@@ -1039,13 +1034,13 @@ function drawRangeChart(w,p,hitPel,hitFrag,dist){
   };
   note.innerHTML =
     w.rng.src === "measured"
-      ? `<em>Measured, not modelled.</em> Range-tested at eight fixed distances to within about 0.3%.
+      ? `<em>Estimated Values</em> Range-tested at eight fixed distances to within about 0.3%.
          Calibre ${ph.cal}, ${ph.mass}g at ${ph.v0} m/s, drag ${ph.drag}. Keeps
          <b>${Math.round(falloff(w,max)*100)}%</b> of its damage at ${max}m, the furthest point measured.`
    : w.rng.src === "curve"
       ? `<em>Stated by the wiki.</em> ${w.rng.note||""}`
    : w.rng.src === "rule"
-      ? `<em>Ruled out by the mechanic.</em> This is ${RULE[w.noFall]} Flat here is a real answer, not a gap.`
+      ? `<em>Ruled out by the mechanic.</em> This is ${RULE[w.noFall]} Flat here.`
       : `<em>Not in the measured dataset.</em> That dataset covers 77 weapons and this is not one of
          them, so the line is flat by default rather than by evidence. Most of the unmeasured
          entries here are explosion, spray or fragment rows, where the blast is what does the work
